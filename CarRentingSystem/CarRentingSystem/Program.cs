@@ -1,6 +1,7 @@
 namespace CarRentingSystem
 {
     using CarRentingSystem.Data;
+    using CarRentingSystem.Infratructure;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.EntityFrameworkCore;
 
@@ -11,7 +12,7 @@ namespace CarRentingSystem
             var builder = WebApplication.CreateBuilder(args);
 
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-            builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
+            builder.Services.AddDbContext<CarRentingDbContext>(options => options.UseSqlServer(connectionString));
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
             builder.Services.AddDefaultIdentity<IdentityUser>(options =>
@@ -21,10 +22,12 @@ namespace CarRentingSystem
                 options.Password.RequireUppercase = false;
                 options.Password.RequireNonAlphanumeric = false;
             })
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+                .AddEntityFrameworkStores<CarRentingDbContext>();
             builder.Services.AddControllersWithViews();
 
             var app = builder.Build();
+
+            app.PrepareDatabase();
 
             if (app.Environment.IsDevelopment())
             {
