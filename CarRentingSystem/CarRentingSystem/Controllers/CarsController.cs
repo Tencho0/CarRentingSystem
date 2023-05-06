@@ -11,7 +11,7 @@
 
         public CarsController(CarRentingDbContext data) => this.data = data;
 
-        public IActionResult All([FromQuery]AllCarsQueryModel query)
+        public IActionResult All([FromQuery] AllCarsQueryModel query)
         {
             var carsQuery = this.data.Cars.AsQueryable();
 
@@ -34,7 +34,11 @@
                 CarSorting.DateCreated or _ => carsQuery.OrderByDescending(c => c.Id)
             };
 
+            var totalCars = carsQuery.Count();
+
             var cars = carsQuery
+                .Skip((query.CurrentPage - 1) * AllCarsQueryModel.CarsPerPage)
+                .Take(AllCarsQueryModel.CarsPerPage)
                 .Select(c => new CarListingViewModel
                 {
                     Id = c.Id,
@@ -54,6 +58,7 @@
 
             query.Brands = carBrands;
             query.Cars = cars;
+            query.TotalCars = totalCars;
 
             return View(query);
         }
