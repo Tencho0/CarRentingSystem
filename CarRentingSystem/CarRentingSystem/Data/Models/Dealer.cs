@@ -1,9 +1,9 @@
 ﻿namespace CarRentingSystem.Data.Models
 {
     using System.ComponentModel.DataAnnotations;
-    using static DataConstants.Category;
+    using static DataConstants.Dealer;
 
-    public class Category
+    public class Dealer
     {
         public int Id { get; set; }
 
@@ -11,6 +11,14 @@
         [MaxLength(NameMaxLength)]
         public string Name { get; set; } = null!;
 
+        [Required]
+        [MaxLength(PhoneNumberMaxLength)]
+        public string PhoneNumber { get; set; } = null!;
+
+        [Required]
+        public string UserId { get; set; } = null!;
+
+        [Required]
         public IEnumerable<Car> Cars { get; set; } = new List<Car>();
     }
 }
