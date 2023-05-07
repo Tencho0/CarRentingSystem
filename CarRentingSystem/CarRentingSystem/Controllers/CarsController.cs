@@ -2,7 +2,9 @@
 {
     using CarRentingSystem.Data;
     using CarRentingSystem.Data.Models;
+    using CarRentingSystem.Infratructure;
     using CarRentingSystem.Models.Cars;
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
 
     public class CarsController : Controller
@@ -63,14 +65,34 @@
             return View(query);
         }
 
-        public IActionResult Add() => View(new AddCarFormModel
+        [Authorize]
+        public IActionResult Add()
         {
-            Categories = this.GetCarCategories()
-        });
+            if (!this.UserIsDealer())
+            {
+                return RedirectToAction(nameof(DealersController.Become), "Dealers");
+            }
+
+            return View(new AddCarFormModel
+            {
+                Categories = this.GetCarCategories()
+            });
+        }
 
         [HttpPost]
+        [Authorize]
         public IActionResult Add(AddCarFormModel car)
         {
+            var dealerId = this.data.Dealers
+                .Where(d => d.UserId == this.User.GetId())
+                .Select(d => d.Id)
+                .FirstOrDefault();
+
+            if (dealerId == 0)
+            {
+                return RedirectToAction(nameof(DealersController.Become), "Dealers");
+            }
+
             if (!this.data.Categories.Any(c => c.Id == car.CategoryId))
             {
                 this.ModelState.AddModelError(nameof(car.CategoryId), "Category does not exist!");
@@ -89,7 +111,8 @@
                 Description = car.Description,
                 ImageUrl = car.ImageUrl,
                 Year = car.Year,
-                CategoryId = car.CategoryId
+                CategoryId = car.CategoryId,
+                DealerId = dealerId
             };
 
             this.data.Cars.Add(carData);
@@ -97,6 +120,10 @@
 
             return RedirectToAction(nameof(All));
         }
+
+        private bool UserIsDealer()
+            => this.data.Dealers
+                .Any(d => d.UserId == this.User.GetId());
 
         private IEnumerable<CarCategoryViewModel> GetCarCategories()
         => this.data
