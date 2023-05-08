@@ -50,6 +50,7 @@
 <div class="row mb-5">
     <div class="col-md-6">
         <a class="btn btn-primary @(Model.CurrentPage == 1 ? "disabled" : string.Empty)"
+           style="margin-top: 10px;"
            asp-controller="Cars"
            asp-action="All"
            asp-route-currentPage="@previousPage"
@@ -57,9 +58,15 @@
            asp-route-searchTerm="@Model.SearchTerm"
            asp-route-sorting="@((int)Model.Sorting)"><<</a>
     </div>
+
+    @{
+        var shouldButtonBeDisabled = Model.CurrentPage == maxPage ||
+        !Model.Cars.Any();
+    }
+
     <div class="col-md-6">
-        <a class="btn btn-primary @(Model.CurrentPage == maxPage ? "disabled" : string.Empty)"
-           style="float: right;"
+        <a class="btn btn-primary @(shouldButtonBeDisabled ? "disabled" : string.Empty)"
+           style="float: right; margin-top: 10px;"
            asp-controller="Cars"
            asp-action="All"
            asp-route-currentPage="@(Model.CurrentPage + 1)"
