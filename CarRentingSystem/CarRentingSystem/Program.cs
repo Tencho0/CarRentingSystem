@@ -2,6 +2,8 @@ namespace CarRentingSystem
 {
     using CarRentingSystem.Data;
     using CarRentingSystem.Infratructure;
+    using CarRentingSystem.Services.Cars;
+    using CarRentingSystem.Services.Statistics;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.EntityFrameworkCore;
 
@@ -24,6 +26,9 @@ namespace CarRentingSystem
             })
                 .AddEntityFrameworkStores<CarRentingDbContext>();
             builder.Services.AddControllersWithViews();
+
+            builder.Services.AddTransient<IStatisticsServices, StatisticsService>();
+            builder.Services.AddTransient<ICarService, CarService>();
 
             var app = builder.Build();
 
