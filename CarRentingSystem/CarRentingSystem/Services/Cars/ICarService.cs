@@ -6,6 +6,12 @@
     {
         CarQueryServiceModel All(string brand, string searchTerm, CarSorting sorting, int currentPage, int carsPerPage);
 
-        IEnumerable<string> AllCarBrands();
+        CarDetailsServiceModel Details(int id);
+
+        IEnumerable<CarServiceModel> ByUser(string userId);
+
+        IEnumerable<string> AllBrands();
+
+        IEnumerable<CarCategoryServiceModel> AllCategories();
     }
 }
