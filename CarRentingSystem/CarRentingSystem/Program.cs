@@ -1,11 +1,13 @@
 namespace CarRentingSystem
 {
     using CarRentingSystem.Data;
+    using CarRentingSystem.Data.Models;
     using CarRentingSystem.Infratructure;
     using CarRentingSystem.Services.Cars;
     using CarRentingSystem.Services.Dealers;
     using CarRentingSystem.Services.Statistics;
     using Microsoft.AspNetCore.Identity;
+    using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
 
     public class Program
@@ -18,15 +20,20 @@ namespace CarRentingSystem
             builder.Services.AddDbContext<CarRentingDbContext>(options => options.UseSqlServer(connectionString));
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-            builder.Services.AddDefaultIdentity<IdentityUser>(options =>
+            builder.Services.AddDefaultIdentity<User>(options =>
             {
                 options.Password.RequireDigit = false;
                 options.Password.RequireLowercase = false;
                 options.Password.RequireUppercase = false;
                 options.Password.RequireNonAlphanumeric = false;
             })
+                .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<CarRentingDbContext>();
-            builder.Services.AddControllersWithViews();
+
+            builder.Services.AddControllersWithViews(options =>
+            {
+                options.Filters.Add<AutoValidateAntiforgeryTokenAttribute>();
+            });
 
             builder.Services.AddTransient<ICarService, CarService>();
             builder.Services.AddTransient<IDealerService, DealerService>();
@@ -58,6 +65,7 @@ namespace CarRentingSystem
             //    name: "default",
             //    pattern: "{controller=Home}/{action=Index}/{id?}");
             app.MapRazorPages();
+            app.UseAuthentication(); ;
 
             app.Run();
         }
