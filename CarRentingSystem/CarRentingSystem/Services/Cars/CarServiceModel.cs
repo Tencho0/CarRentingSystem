@@ -12,6 +12,6 @@
 
         public int Year { get; init; }
 
-        public string Category { get; set; } = null!;
+        public string CategoryName { get; set; } = null!;
     }
 }

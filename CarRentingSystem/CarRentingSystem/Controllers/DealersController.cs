@@ -21,7 +21,7 @@
         [Authorize]
         public IActionResult Become(BecomeDealerFromModel dealer)
         {
-            var userId = this.User.GetId();
+            var userId = this.User.Id();
             var userIdAlreadyDealer = this.data.Dealers
                 .Any(d => d.UserId == userId);
 

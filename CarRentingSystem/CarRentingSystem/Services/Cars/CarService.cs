@@ -1,9 +1,10 @@
 ﻿namespace CarRentingSystem.Services.Cars
 {
-    using CarRentingSystem.Models;
-    using CarRentingSystem.Data;
     using System.Collections.Generic;
+    using System.Linq;
+    using CarRentingSystem.Data;
     using CarRentingSystem.Data.Models;
+    using CarRentingSystem.Models;
 
     public class CarService : ICarService
     {
@@ -61,15 +62,57 @@
                             Description = c.Description,
                             ImageUrl = c.ImageUrl,
                             Year = c.Year,
-                            Category = c.Category.Name,
+                            CategoryName = c.Category.Name,
                             DealerId = c.DealerId,
                             DealerName = c.Dealer.Name,
                             UserId = c.Dealer.UserId
                         })
                         .FirstOrDefault()!;
 
+        public int Create(string brand, string model, string description, string imageUrl, int year, int categoryId, int dealerId)
+        {
+            var carData = new Car
+            {
+                Brand = brand,
+                Model = model,
+                Description = description,
+                ImageUrl = imageUrl,
+                Year = year,
+                CategoryId = categoryId,
+                DealerId = dealerId
+            };
+
+            this.data.Cars.Add(carData);
+            this.data.SaveChanges();
+
+            return carData.Id;
+        }
+
+        public bool Edit(int id, string brand, string model, string description, string imageUrl, int year, int categoryId)
+        {
+            var carData = this.data.Cars.Find(id);
+
+            if (carData == null)
+            {
+                return false;
+            }
+
+            carData.Brand = brand;
+            carData.Model = model;
+            carData.Description = description;
+            carData.ImageUrl = imageUrl;
+            carData.Year = year;
+            carData.CategoryId = categoryId;
+
+            this.data.SaveChanges();
+            return true;
+        }
+
         public IEnumerable<CarServiceModel> ByUser(string userId)
               => GetCars(this.data.Cars.Where(c => c.Dealer.UserId == userId));
+
+        public bool IsByDealer(int carId, int dealerId)
+              => this.data.Cars.Any(c => c.Id == carId && c.DealerId == dealerId);
 
         public IEnumerable<string> AllBrands()
               => this.data.Cars
@@ -96,8 +139,11 @@
                      Model = c.Model,
                      ImageUrl = c.ImageUrl,
                      Year = c.Year,
-                     Category = c.Category.Name
+                     CategoryName = c.Category.Name
                  })
                 .ToList();
+
+        public bool CategoryExists(int categoryId)
+            => this.data.Categories.Any(c => c.Id == categoryId);
     }
 }

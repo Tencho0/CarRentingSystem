@@ -9,7 +9,7 @@
         public DealerService(CarRentingDbContext data) 
             => this.data = data;
 
-        public int GetIdByUser(string userId)
+        public int IdByUser(string userId)
             => this.data.Dealers
                 .Where(d => d.UserId == userId)
                 .Select(d => d.Id)

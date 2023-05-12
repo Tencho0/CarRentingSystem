@@ -4,10 +4,12 @@
     {
         public string Description { get; init; } = null!;
 
+        public int CategoryId { get; init; }
+
         public int DealerId { get; init; }
 
-        public string DealerName { get; set; }
+        public string DealerName { get; init; } = null!;
 
-        public string UserId { get; set; }
+        public string UserId { get; init; } = null!;
     }
 }
