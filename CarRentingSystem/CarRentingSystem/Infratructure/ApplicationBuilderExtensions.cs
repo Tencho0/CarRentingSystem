@@ -7,7 +7,7 @@
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.DependencyInjection;
 
-    using static WebConstants;
+    using static CarRentingSystem.Areas.Admin.AdminConstants;
 
     public static class ApplicationBuilderExtensions
     {
