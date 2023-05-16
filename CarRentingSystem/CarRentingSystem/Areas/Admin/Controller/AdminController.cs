@@ -8,7 +8,5 @@
     [Area(AreaName)]
     [Authorize(Roles = AdministratorRoleName)]
     public abstract class AdminController : Controller
-    {
-
-    }
+    { }
 }

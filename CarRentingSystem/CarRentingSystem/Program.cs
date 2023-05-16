@@ -2,6 +2,7 @@ namespace CarRentingSystem
 {
     using CarRentingSystem.Data;
     using CarRentingSystem.Data.Models;
+    using CarRentingSystem.Infrastructure;
     using CarRentingSystem.Infratructure;
     using CarRentingSystem.Services.Cars;
     using CarRentingSystem.Services.Dealers;
@@ -29,6 +30,8 @@ namespace CarRentingSystem
             })
                 .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<CarRentingDbContext>();
+
+            builder.Services.AddAutoMapper(typeof(Program));
 
             builder.Services.AddControllersWithViews(options =>
             {
@@ -60,9 +63,7 @@ namespace CarRentingSystem
                 .UseAuthentication()
                 .UseAuthorization();
 
-            app.MapControllerRoute(
-                name: "Areas",
-                pattern: "/{area:exists}/{controller=Home}/{action=Index}/{id?}");
+            app.MapDefaultAreaRoute();
             app.MapDefaultControllerRoute();
             app.MapRazorPages();
             app.UseAuthentication(); ;

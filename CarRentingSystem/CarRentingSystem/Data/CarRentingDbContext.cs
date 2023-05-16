@@ -11,11 +11,11 @@
         {
         }
 
-        public DbSet<Car> Cars { get; init; }
+        public DbSet<Car> Cars { get; init; } = null!;
 
-        public DbSet<Category> Categories { get; init; }
+        public DbSet<Category> Categories { get; init; } = null!;
 
-        public DbSet<Dealer> Dealers { get; init; }
+        public DbSet<Dealer> Dealers { get; init; } = null!;
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
