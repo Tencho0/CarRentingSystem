@@ -3,7 +3,7 @@
     using System;
     using Microsoft.EntityFrameworkCore;
 
-    using CarRentingSystem.Data;
+    using Data;
 
     public static class DatabaseMock
     {
