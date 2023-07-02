@@ -10,7 +10,7 @@
         [Fact]
         public void ErrorShouldReturnView()
         {
-            var controller = new HomeController(null, null, null);
+            var controller = new HomeController(null, null);
 
             var result = controller.Error();
 

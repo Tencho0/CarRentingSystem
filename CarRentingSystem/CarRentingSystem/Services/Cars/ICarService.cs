@@ -7,6 +7,8 @@
     {
         CarQueryServiceModel All(string brand, string searchTerm, CarSorting sorting, int currentPage, int carsPerPage);
 
+        IEnumerable<LatestCarServiceModel> Latest();
+
         CarDetailsServiceModel Details(int carId);
 
         int Create(string brand, string model, string description, string imageUrl, int year, int categoryId, int dealerId);
