@@ -11,11 +11,11 @@
 
     public class HomeController : Controller
     {
-        private readonly IStatisticsServices statistics;
+        private readonly IStatisticsService statistics;
         private readonly CarRentingDbContext data;
         private readonly IMapper mapper;
 
-        public HomeController(IStatisticsServices statistics, CarRentingDbContext data, IMapper mapper)
+        public HomeController(IStatisticsService statistics, CarRentingDbContext data, IMapper mapper)
         {
             this.statistics = statistics;
             this.data = data;

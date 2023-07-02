@@ -40,7 +40,7 @@ namespace CarRentingSystem
 
             builder.Services.AddTransient<ICarService, CarService>();
             builder.Services.AddTransient<IDealerService, DealerService>();
-            builder.Services.AddTransient<IStatisticsServices, StatisticsService>();
+            builder.Services.AddTransient<IStatisticsService, StatisticsService>();
 
             var app = builder.Build();
 

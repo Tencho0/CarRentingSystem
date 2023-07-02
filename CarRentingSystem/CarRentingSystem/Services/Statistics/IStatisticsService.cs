@@ -1,6 +1,6 @@
 ﻿namespace CarRentingSystem.Services.Statistics
 {
-    public interface IStatisticsServices
+    public interface IStatisticsService
     {
         StatisticsServiceModel Total();
     }

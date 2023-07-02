@@ -7,9 +7,9 @@
     [Route("api/statistics")]
     public class StatisticsApiController : ControllerBase
     {
-        private readonly IStatisticsServices statistics;
+        private readonly IStatisticsService statistics;
 
-        public StatisticsApiController(IStatisticsServices statistics) 
+        public StatisticsApiController(IStatisticsService statistics) 
             => this.statistics = statistics;
 
         [HttpGet]
