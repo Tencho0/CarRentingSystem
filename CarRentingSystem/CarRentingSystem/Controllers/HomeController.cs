@@ -1,34 +1,38 @@
 ﻿namespace CarRentingSystem.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Extensions.Caching.Memory;
 
-    using Models.Home;
     using Services.Cars;
-    using Services.Statistics;
+    using CarRentingSystem.Services.Cars.Models;
 
     public class HomeController : Controller
     {
         private readonly ICarService cars;
-        private readonly IStatisticsService statistics;
+        private readonly IMemoryCache cache;
 
-        public HomeController(ICarService cars, IStatisticsService statistics)
+        public HomeController(ICarService cars, IMemoryCache cache)
         {
             this.cars = cars;
-            this.statistics = statistics;
+            this.cache = cache;
         }
 
         public IActionResult Index()
         {
-            var latestCars = this.cars.Latest().ToList();
+            const string latestCarsCacheKey = "LatestCarsCacheKey";
 
-            var totalStatistics = this.statistics.Total();
-
-            return View(new IndexViewModel
+            var latestCars = this.cache.Get<List<LatestCarServiceModel>>(latestCarsCacheKey);
+            if (latestCars == null)
             {
-                TotalCars = totalStatistics.TotalCars,
-                TotalUsers = totalStatistics.TotalUsers,
-                Cars = latestCars
-            });
+                latestCars = this.cars.Latest().ToList();
+
+                var cacheOptions = new MemoryCacheEntryOptions()
+                    .SetAbsoluteExpiration(TimeSpan.FromMinutes(15));
+
+                this.cache.Set(latestCarsCacheKey, latestCars, cacheOptions);
+            }
+
+            return View(latestCars);
         }
         public IActionResult Error() => View();
     }

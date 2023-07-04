@@ -32,6 +32,7 @@ namespace CarRentingSystem
                 .AddEntityFrameworkStores<CarRentingDbContext>();
 
             builder.Services.AddAutoMapper(typeof(Program));
+            builder.Services.AddMemoryCache();
 
             builder.Services.AddControllersWithViews(options =>
             {
