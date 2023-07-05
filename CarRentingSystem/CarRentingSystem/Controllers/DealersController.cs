@@ -7,6 +7,8 @@
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
 
+    using static WebConstants;
+
     public class DealersController : Controller
     {
         private readonly CarRentingDbContext data;
@@ -44,6 +46,8 @@
 
             this.data.Add(dealerData);
             this.data.SaveChanges();
+
+            TempData[GlobalMessageKey] = "Thank you for becoming a dealer!";
 
             return RedirectToAction("All", "Cars");
         }

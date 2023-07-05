@@ -8,6 +8,8 @@
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
 
+    using static WebConstants;
+
     public class CarsController : Controller
     {
         private readonly ICarService cars;
@@ -81,6 +83,8 @@
 
             this.cars.Create(car.Brand, car.Model, car.Description, car.ImageUrl, car.Year, car.CategoryId, dealerId);
 
+            TempData[GlobalMessageKey] = "Your car was added successfully!";
+
             return RedirectToAction(nameof(All));
         }
 
@@ -134,6 +138,8 @@
             }
 
             this.cars.Edit(id, car.Brand, car.Model, car.Description, car.ImageUrl, car.Year, car.CategoryId);
+
+            TempData[GlobalMessageKey] = "Your car was edited successfully!";
 
             return RedirectToAction(nameof(All));
         }
