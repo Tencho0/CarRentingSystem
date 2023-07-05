@@ -15,7 +15,11 @@
         <p class="lead">There are no cars in the system currently available so why don't you just add one?</p>
         <hr class="my-4">
         <p class="lead">
-            <a asp-controller="Cars" asp-action="Add" class="btn btn-primary btn-lg" role="button">Add Car</a>
+            <a asp-controller="Cars"
+               asp-action="Add"
+               class="btn btn-primary btn-lg" role="button">
+                Add Car
+            </a>
         </p>
     </div>
 }
@@ -35,7 +39,10 @@
                         <a class="btn btn-primary"
                            asp-controller="Cars"
                            asp-action="Details"
-                           asp-route-id="@car.Id">@car.Year  @car.Brand @car.Model</a>
+                           asp-route-id="@car.Id"
+                           asp-route-information="@(car.Brand + " " + @car.Model)">
+                            @car.Year @car.Brand @car.Model
+                        </a>
                     </h5>
                 </div>
             </div>

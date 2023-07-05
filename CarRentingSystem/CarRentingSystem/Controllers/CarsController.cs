@@ -45,6 +45,13 @@
             return View(myCars);
         }
 
+        public IActionResult Details(int id, string information)
+        {
+            var car = this.cars.Details(id);
+
+            return View(car);
+        }
+
         [Authorize]
         public IActionResult Add()
         {

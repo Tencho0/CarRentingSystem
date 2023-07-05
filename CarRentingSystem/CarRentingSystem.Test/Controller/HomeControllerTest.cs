@@ -1,13 +1,13 @@
 ﻿namespace CarRentingSystem.Test.Controller
 {
-    using CarRentingSystem.Data.Models;
-    using CarRentingSystem.Services.Cars;
-    using CarRentingSystem.Services.Statistics;
-    using Models.Home;
-    using Controllers;
-    using Microsoft.AspNetCore.Mvc;
     using Mock;
     using Xunit;
+    using Microsoft.AspNetCore.Mvc;
+    using CarRentingSystem.Data.Models;
+    using CarRentingSystem.Services.Cars;
+    using CarRentingSystem.Services.Cars.Models;
+    using Controllers;
+    using Microsoft.Extensions.Caching.Memory;
 
     public class HomeControllerTest
     {
@@ -23,19 +23,17 @@
             data.SaveChanges();
 
             var carService = new CarService(data, mapper);
-            var statisticsService = new StatisticsService(data);
-            var homeController = new HomeController(carService, statisticsService);
+            var cache = new MemoryCache(new MemoryCacheOptions());
+            var homeController = new HomeController(carService, cache);
 
             var result = homeController.Index();
 
             Assert.NotNull(result);
             var viewResult = Assert.IsType<ViewResult>(result);
             var model = viewResult.Model;
-            var indexViewModel = Assert.IsType<IndexViewModel>(model);
+            var indexViewModel = Assert.IsType<List<LatestCarServiceModel>>(model);
 
-            Assert.Equal(3, indexViewModel.Cars.Count);
-            Assert.Equal(10, indexViewModel.TotalCars);
-            Assert.Equal(1, indexViewModel.TotalUsers);
+            Assert.Equal(3, indexViewModel.Count);
         }
 
         [Fact]

@@ -6,6 +6,8 @@
 
         public int CategoryId { get; init; }
 
+        public string CategoryName { get; init; } = null!;
+
         public int DealerId { get; init; }
 
         public string DealerName { get; init; } = null!;
