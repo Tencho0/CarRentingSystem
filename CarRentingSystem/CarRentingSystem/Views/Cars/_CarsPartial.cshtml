@@ -10,8 +10,9 @@
                     <h5 class="card-title text-center">@car.Year  @car.Brand @car.Model (@car.CategoryName)</h5>
                     <a asp-controller="Cars"
                        asp-action="Details"
-                       asp-route-id="@car.Id" class="btn btn-primary"
-                       asp-route-information="@(car.Brand + " " + @car.Model)">
+                       asp-route-id="@car.Id"
+                       asp-route-information="@car.GetInformation()"
+                       class="btn btn-primary">
                         View
                     </a>
                     @if (ViewBag.AllowCarEdit == true || User.IsAdmin())

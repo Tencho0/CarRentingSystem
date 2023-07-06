@@ -4,6 +4,7 @@
     using System.Linq;
     using AutoMapper;
     using AutoMapper.QueryableExtensions;
+
     using CarRentingSystem.Data;
     using CarRentingSystem.Data.Models;
     using CarRentingSystem.Models;
@@ -20,9 +21,15 @@
             this.mapper = mapper;
         }
 
-        public CarQueryServiceModel All(string brand, string searchTerm, CarSorting sorting, int currentPage, int carsPerPage)
+        public CarQueryServiceModel All(
+            string brand = null,
+            string searchTerm = null,
+            CarSorting sorting = CarSorting.DateCreated,
+            int currentPage = 1,
+            int carsPerPage = int.MaxValue,
+            bool publicOnly = true)
         {
-            var carsQuery = this.data.Cars.AsQueryable();
+            var carsQuery = this.data.Cars.Where(c => !publicOnly || c.IsPublic);
 
             if (!string.IsNullOrWhiteSpace(brand))
             {
@@ -59,11 +66,11 @@
 
         public IEnumerable<LatestCarServiceModel> Latest()
               => this.data.Cars
+                .Where(c => c.IsPublic)
                 .OrderByDescending(x => x.Id)
                 .ProjectTo<LatestCarServiceModel>(this.mapper.ConfigurationProvider)
                 .Take(3)
                 .ToList();
-
 
         public CarDetailsServiceModel Details(int id)
               => this.data.Cars
@@ -81,7 +88,8 @@
                 ImageUrl = imageUrl,
                 Year = year,
                 CategoryId = categoryId,
-                DealerId = dealerId
+                DealerId = dealerId,
+                IsPublic = false
             };
 
             this.data.Cars.Add(carData);
@@ -90,7 +98,14 @@
             return carData.Id;
         }
 
-        public bool Edit(int id, string brand, string model, string description, string imageUrl, int year, int categoryId)
+        public bool Edit(int id,
+            string brand,
+            string model,
+            string description,
+            string imageUrl,
+            int year,
+            int categoryId,
+            bool isPublic)
         {
             var carData = this.data.Cars.Find(id);
 
@@ -105,6 +120,7 @@
             carData.ImageUrl = imageUrl;
             carData.Year = year;
             carData.CategoryId = categoryId;
+            carData.IsPublic = isPublic;
 
             this.data.SaveChanges();
             return true;
@@ -116,6 +132,15 @@
         public bool IsByDealer(int carId, int dealerId)
               => this.data.Cars.Any(c => c.Id == carId && c.DealerId == dealerId);
 
+        public void ChangeVisibility(int carId)
+        {
+            var car = this.data.Cars.Find(carId);
+
+            car.IsPublic = !car.IsPublic;
+
+            this.data.SaveChanges();
+        }
+
         public IEnumerable<string> AllBrands()
               => this.data.Cars
                         .Select(c => c.Brand)
@@ -125,25 +150,13 @@
 
         public IEnumerable<CarCategoryServiceModel> AllCategories()
               => this.data.Categories
-                    .Select(c => new CarCategoryServiceModel
-                    {
-                        Id = c.Id,
-                        Name = c.Name,
-                    })
+                  .ProjectTo<CarCategoryServiceModel>(this.mapper.ConfigurationProvider)
                     .ToList();
 
-        private static IEnumerable<CarServiceModel> GetCars(IQueryable<Car> carQuery)
+        private IEnumerable<CarServiceModel> GetCars(IQueryable<Car> carQuery)
               => carQuery
-                 .Select(c => new CarServiceModel
-                 {
-                     Id = c.Id,
-                     Brand = c.Brand,
-                     Model = c.Model,
-                     ImageUrl = c.ImageUrl,
-                     Year = c.Year,
-                     CategoryName = c.Category.Name
-                 })
-                .ToList();
+                  .ProjectTo<CarServiceModel>(this.mapper.ConfigurationProvider)
+                  .ToList();
 
         public bool CategoryExists(int categoryId)
             => this.data.Categories.Any(c => c.Id == categoryId);

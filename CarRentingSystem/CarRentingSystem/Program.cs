@@ -2,8 +2,7 @@ namespace CarRentingSystem
 {
     using CarRentingSystem.Data;
     using CarRentingSystem.Data.Models;
-    using CarRentingSystem.Infrastructure;
-    using CarRentingSystem.Infratructure;
+    using CarRentingSystem.Infratructure.Extensions;
     using CarRentingSystem.Services.Cars;
     using CarRentingSystem.Services.Dealers;
     using CarRentingSystem.Services.Statistics;
@@ -65,6 +64,11 @@ namespace CarRentingSystem
                 .UseAuthorization();
 
             app.MapDefaultAreaRoute();
+            app.MapControllerRoute(
+                name: "Car Details",
+                pattern: "/Cars/Details/{id}/{information}",
+                defaults: new { controller = "Cars", action = "Details" });
+
             app.MapDefaultControllerRoute();
             app.MapRazorPages();
             app.UseAuthentication(); ;

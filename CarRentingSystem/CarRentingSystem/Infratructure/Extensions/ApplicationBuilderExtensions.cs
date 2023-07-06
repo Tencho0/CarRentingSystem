@@ -1,4 +1,4 @@
-﻿namespace CarRentingSystem.Infratructure
+﻿namespace CarRentingSystem.Infratructure.Extensions
 {
     using CarRentingSystem.Data;
     using CarRentingSystem.Data.Models;

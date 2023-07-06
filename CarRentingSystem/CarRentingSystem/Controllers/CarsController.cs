@@ -1,7 +1,7 @@
 ﻿namespace CarRentingSystem.Controllers
 {
     using AutoMapper;
-    using CarRentingSystem.Infratructure;
+    using CarRentingSystem.Infratructure.Extensions;
     using CarRentingSystem.Models.Cars;
     using CarRentingSystem.Services.Cars;
     using CarRentingSystem.Services.Dealers;
@@ -49,6 +49,11 @@
         {
             var car = this.cars.Details(id);
 
+            if (information != car.GetInformation())
+            {
+                return BadRequest();
+            }
+
             return View(car);
         }
 
@@ -88,11 +93,22 @@
                 return View(car);
             }
 
-            this.cars.Create(car.Brand, car.Model, car.Description, car.ImageUrl, car.Year, car.CategoryId, dealerId);
+            var carId = this.cars.Create(
+                car.Brand,
+                car.Model,
+                car.Description,
+                car.ImageUrl,
+                car.Year,
+                car.CategoryId,
+                dealerId);
 
-            TempData[GlobalMessageKey] = "Your car was added successfully!";
+            TempData[GlobalMessageKey] = "Your car was added successfully and is awaiting for approval!";
 
-            return RedirectToAction(nameof(All));
+            return RedirectToAction(nameof(Details), new
+            {
+                id = carId,
+                information = car.GetInformation()
+            });
         }
 
         [Authorize]
@@ -144,11 +160,23 @@
                 return BadRequest();
             }
 
-            this.cars.Edit(id, car.Brand, car.Model, car.Description, car.ImageUrl, car.Year, car.CategoryId);
+            this.cars.Edit(
+                id,
+                car.Brand,
+                car.Model,
+                car.Description,
+                car.ImageUrl,
+                car.Year,
+                car.CategoryId,
+                this.User.IsAdmin());
 
-            TempData[GlobalMessageKey] = "Your car was edited successfully!";
+            TempData[GlobalMessageKey] = $"Your car was edited successfully{(this.User.IsAdmin() ? string.Empty : " and is awaiting for approval")}!";
 
-            return RedirectToAction(nameof(All));
+            return RedirectToAction(nameof(Details), new
+            {
+                id,
+                information = car.GetInformation()
+            });
         }
     }
 }
