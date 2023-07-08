@@ -1,7 +1,8 @@
 ﻿namespace CarRentingSystem.Test.Controller.Api
 {
     using Xunit;
-    using CarRentingSystem.Test.Mock;
+
+    using Mock;
     using CarRentingSystem.Controllers.Api;
 
     public class StatisticsApiControllerTest

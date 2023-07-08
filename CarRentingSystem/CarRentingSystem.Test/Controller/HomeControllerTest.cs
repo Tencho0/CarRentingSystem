@@ -1,13 +1,18 @@
 ﻿namespace CarRentingSystem.Test.Controller
 {
-    using Mock;
     using Xunit;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Extensions.Caching.Memory;
+    using MyTested.AspNetCore.Mvc;
+
+    using Mock;
+    using Controllers;
     using CarRentingSystem.Data.Models;
     using CarRentingSystem.Services.Cars;
     using CarRentingSystem.Services.Cars.Models;
-    using Controllers;
-    using Microsoft.Extensions.Caching.Memory;
+
+    using static Data.Cars;
+    using AutoMapper;
 
     public class HomeControllerTest
     {
@@ -17,7 +22,7 @@
             var data = DatabaseMock.Instance;
             var mapper = MapperMock.Instance;
 
-            var cars = GetCars();
+            var cars = TenPublicCars();
             data.Cars.AddRange(cars);
             data.Users.Add(new User { FullName = "Petar" });
             data.SaveChanges();
@@ -36,6 +41,16 @@
             Assert.Equal(3, indexViewModel.Count);
         }
 
+        //[Fact]
+        //public void ErrorShouldReturnView2()
+        //=> MyMvc
+        //    .Pipeline()
+        //    .ShouldMap("/Home/Error")
+        //    .To<HomeController>(c => c.Error())
+        //    .Which()
+        //    .ShouldReturn()
+        //    .View();
+
         [Fact]
         public void ErrorShouldReturnView()
         {
@@ -46,14 +61,5 @@
             Assert.NotNull(result);
             Assert.IsType<ViewResult>(result);
         }
-
-        private static IEnumerable<Car> GetCars()
-        => Enumerable.Range(0, 10).Select(x => new Car
-        {
-            Brand = "BMW",
-            Model = "M4 coupe",
-            Description = "Very fast Bmw m4 coupe",
-            ImageUrl = "https://www.driving.co.uk/wp-content/uploads/sites/5/2014/08/BMWM4.jpg"
-        });
     }
 }

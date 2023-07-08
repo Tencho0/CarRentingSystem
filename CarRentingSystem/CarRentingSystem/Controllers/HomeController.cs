@@ -6,6 +6,8 @@
     using Services.Cars;
     using CarRentingSystem.Services.Cars.Models;
 
+    using static WebConstants.Cache;
+
     public class HomeController : Controller
     {
         private readonly ICarService cars;
@@ -19,9 +21,7 @@
 
         public IActionResult Index()
         {
-            const string latestCarsCacheKey = "LatestCarsCacheKey";
-
-            var latestCars = this.cache.Get<List<LatestCarServiceModel>>(latestCarsCacheKey);
+            var latestCars = this.cache.Get<List<LatestCarServiceModel>>(LatestCarsCacheKey);
             if (latestCars == null)
             {
                 latestCars = this.cars.Latest().ToList();
@@ -29,7 +29,7 @@
                 var cacheOptions = new MemoryCacheEntryOptions()
                     .SetAbsoluteExpiration(TimeSpan.FromMinutes(15));
 
-                this.cache.Set(latestCarsCacheKey, latestCars, cacheOptions);
+                this.cache.Set(LatestCarsCacheKey, latestCars, cacheOptions);
             }
 
             return View(latestCars);
