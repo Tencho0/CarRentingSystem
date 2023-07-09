@@ -1,18 +1,16 @@
-﻿namespace CarRentingSystem.Test.Controller
+﻿namespace CarRentingSystem.Test.Controllers
 {
-    using Moq;
-    using Xunit;
-    using MyTested.AspNetCore.Mvc;
-
     using System.Security.Claims;
+    using CarRentingSystem.Controllers;
+    using CarRentingSystem.Models.Dealers;
+    using CarRentingSystem.Test.Mock;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.ViewFeatures;
-
-    using Mock;
-    using CarRentingSystem.Controllers;
-    using CarRentingSystem.Models.Dealers;
+    using Moq;
+    using MyTested.AspNetCore.Mvc;
+    using Xunit;
 
     public class DealersControllerTest
     {
