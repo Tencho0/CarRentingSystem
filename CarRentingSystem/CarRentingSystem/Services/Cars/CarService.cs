@@ -9,6 +9,7 @@
     using CarRentingSystem.Data.Models;
     using CarRentingSystem.Models;
     using CarRentingSystem.Services.Cars.Models;
+    using Microsoft.EntityFrameworkCore;
 
     public class CarService : ICarService
     {
@@ -129,6 +130,9 @@
         public IEnumerable<CarServiceModel> ByUser(string userId)
               => GetCars(this.data.Cars.Where(c => c.Dealer.UserId == userId));
 
+        public bool IsRented(int carId)
+            => this.data.Cars.Any(c => c.Id == carId && c.RenterId != null);
+
         public bool IsByDealer(int carId, int dealerId)
               => this.data.Cars.Any(c => c.Id == carId && c.DealerId == dealerId);
 
@@ -163,5 +167,18 @@
 
         public bool CategoryExists(int categoryId)
             => this.data.Categories.Any(c => c.Id == categoryId);
+
+        public bool ExistsById(int carId)
+            => data.Cars
+                .Where(c => c.IsPublic)
+                .Any(c => c.Id == carId);
+
+        public void RentCar(int carId, string userId)
+        {
+            Car car = data.Cars.First(c => c.Id == carId);
+            car.RenterId = userId;
+
+            data.SaveChanges();
+        }
     }
 }

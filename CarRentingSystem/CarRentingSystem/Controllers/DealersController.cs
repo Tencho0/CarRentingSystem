@@ -41,7 +41,7 @@
             {
                 Name = dealer.Name,
                 PhoneNumber = dealer.PhoneNumber,
-                UserId = userId,
+                UserId = userId!,
             };
 
             this.data.Add(dealerData);

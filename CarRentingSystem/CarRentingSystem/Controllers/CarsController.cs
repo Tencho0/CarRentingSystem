@@ -1,14 +1,16 @@
 ﻿namespace CarRentingSystem.Controllers
 {
     using AutoMapper;
-    using CarRentingSystem.Infratructure.Extensions;
-    using CarRentingSystem.Models.Cars;
-    using CarRentingSystem.Services.Cars;
-    using CarRentingSystem.Services.Dealers;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
 
+    using Infratructure.Extensions;
+    using Models.Cars;
+    using Services.Cars;
+    using Services.Dealers;
+
     using static WebConstants;
+    using static WebConstants.NotificationMessagesConstants;
 
     public class CarsController : Controller
     {
@@ -137,7 +139,7 @@
         [Authorize]
         public IActionResult Edit(int id, CarFormModel car)
         {
-            var dealerId = this.dealers.IdByUser(this.User.Id());
+            var dealerId = this.dealers.IdByUser(this.User.Id()!);
 
             if (dealerId == 0 && !User.IsAdmin())
             {
@@ -182,6 +184,54 @@
                 id,
                 information = car.GetInformation()
             });
+        }
+
+        [HttpPost]
+        public IActionResult Rent(int id)
+        {
+            bool carExists = this.cars.ExistsById(id);
+            if (!carExists)
+            {
+                TempData[ErrorMessage] = "Car with provided Id does not exist! Please try again!";
+
+                return RedirectToAction("All", "Cars");
+            }
+
+            bool isHouseRented =  this.cars.IsRented(id);
+            if (isHouseRented)
+            {
+                TempData[ErrorMessage] =
+                    "Selected Car is already rented by another user! Please select another Car.";
+
+                return RedirectToAction("All", "Cars");
+            }
+
+            bool isUserDealer = this.dealers.IsDealer(this.User.Id()!);
+            if (isUserDealer && !User.IsAdmin())
+            {
+                TempData[ErrorMessage] = "Agents can't rent Cars. Please register as a user!";
+
+                return RedirectToAction("Index", "Home");
+            }
+
+            try
+            {
+                cars.RentCar(id, this.User.Id()!);
+            }
+            catch (Exception)
+            {
+                return GeneralError();
+            }
+
+            return RedirectToAction("Mine", "Cars");
+        }
+
+        private IActionResult GeneralError()
+        {
+            TempData[ErrorMessage] =
+                "Unexpected error occurred! Please try again later or contact administrator";
+
+            return RedirectToAction("Index", "Home");
         }
     }
 }

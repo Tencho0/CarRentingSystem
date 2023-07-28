@@ -38,6 +38,8 @@
 
         IEnumerable<CarServiceModel> ByUser(string userId);
 
+        bool IsRented(int carId);
+
         bool IsByDealer(int carId, int dealerId);
 
         bool IsRentedByUserWithId(int carId, string renterId);
@@ -49,5 +51,9 @@
         IEnumerable<CarCategoryServiceModel> AllCategories();
 
         bool CategoryExists(int categoryId);
+
+        bool ExistsById(int carId);
+
+        void RentCar(int carId, string userId);
     }
 }
