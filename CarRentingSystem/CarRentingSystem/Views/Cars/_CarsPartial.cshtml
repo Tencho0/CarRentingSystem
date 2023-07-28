@@ -5,7 +5,7 @@
 @inject IDealerService DealerService
 @inject ICarService CarService
 @{
-    // bool isAgentOwnerOfTheHouse = await DealerService.HasHouseWithIdAsync(User.GetId(), Model.Id);
+    // bool isAgentOwnerOfTheCar =  DealerService.HasCarWithId(User.GetId(), Model.Id);
 }
 
 <div class="row">
@@ -60,10 +60,11 @@
                         {
                             @if (!isUserDealer && isCarRentedByUserWithId)
                             {
-                                <form asp-controller="Cars"
-                                      asp-action="Leave"
+                                <form class="input-group-sm"
+                                    asp-controller="Cars"
+                                      asp-action="ReturnCar"
                                       asp-route-id="@car.Id" method="post">
-                                    <input class="btn btn-primary" type="submit" value="Leave" />
+                                    <input class="btn btn-primary" type="submit" value="ReturnCar" />
                                 </form>
                             }
                         }

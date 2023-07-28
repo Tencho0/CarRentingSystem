@@ -1,16 +1,15 @@
 ﻿namespace CarRentingSystem.Services.Cars
 {
-    using System.Collections.Generic;
     using System.Linq;
+    using System.Collections.Generic;
     using AutoMapper;
     using AutoMapper.QueryableExtensions;
 
-    using CarRentingSystem.Data;
+    using Data;
+    using Models;
     using CarRentingSystem.Data.Models;
     using CarRentingSystem.Models;
-    using CarRentingSystem.Services.Cars.Models;
-    using Microsoft.EntityFrameworkCore;
-
+    
     public class CarService : ICarService
     {
         private readonly CarRentingDbContext data;
@@ -179,6 +178,19 @@
             car.RenterId = userId;
 
             data.SaveChanges();
+        }
+
+        public void ReturnCar(int carId)
+        {
+            Car car = data.Cars.First(c => c.Id == carId);
+            string renterId = car.RenterId!;
+
+            car.RenterId = null;
+            data.Users
+                .First(u => u.Id == renterId).RentedCars
+                .Remove(car);
+
+            data.SaveChangesAsync();
         }
     }
 }

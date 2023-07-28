@@ -55,5 +55,7 @@
         bool ExistsById(int carId);
 
         void RentCar(int carId, string userId);
+
+        void ReturnCar(int carId);
     }
 }

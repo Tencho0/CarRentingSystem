@@ -45,10 +45,28 @@
         </nav>
     </header>
     <div class="container">
-        @if (TempData.ContainsKey(WebConstants.GlobalMessageKey))
+        @if (TempData.ContainsKey(WebConstants.GlobalMessageKey) || TempData.ContainsKey(WebConstants.NotificationMessagesConstants.SuccessMessage))
         {
             <div class="alert alert-success text-center" role="alert">
                 @TempData[WebConstants.GlobalMessageKey]
+            </div>
+        }
+        @if (TempData.ContainsKey(WebConstants.NotificationMessagesConstants.ErrorMessage)!)
+        {
+            <div class="alert alert-danger text-center" role="alert">
+                @TempData[WebConstants.NotificationMessagesConstants.ErrorMessage]
+            </div>
+        }
+        @if (TempData.ContainsKey(WebConstants.NotificationMessagesConstants.WarningMessage)!)
+        {
+            <div class="alert alert-warning text-center" role="alert">
+                @TempData[WebConstants.NotificationMessagesConstants.WarningMessage]
+            </div>
+        }
+        @if (TempData.ContainsKey(WebConstants.NotificationMessagesConstants.InformationMessage)!)
+        {
+            <div class="alert alert-info text-center" role="alert">
+                @TempData[WebConstants.NotificationMessagesConstants.InformationMessage]
             </div>
         }
         <main role="main" class="pb-3">
