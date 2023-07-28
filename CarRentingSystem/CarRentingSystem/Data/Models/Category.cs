@@ -11,6 +11,6 @@
         [MaxLength(NameMaxLength)]
         public string Name { get; set; } = null!;
 
-        public IEnumerable<Car> Cars { get; set; } = new List<Car>();
+        public virtual IEnumerable<Car> Cars { get; set; } = new List<Car>();
     }
 }

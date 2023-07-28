@@ -28,10 +28,14 @@
 
         public int CategoryId { get; set; }
 
-        public Category Category { get; init; } = null!;
+        public virtual Category Category { get; init; } = null!;
 
         public int DealerId { get; init; }
 
-        public Dealer Dealer { get; init; }
+        public virtual Dealer Dealer { get; init; } = null!;
+
+        public string? RenterId { get; set; }
+
+        public virtual User? Renter { get; set; }
     }
 }
