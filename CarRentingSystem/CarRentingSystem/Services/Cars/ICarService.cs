@@ -40,6 +40,8 @@
 
         bool IsByDealer(int carId, int dealerId);
 
+        bool IsRentedByUserWithId(int carId, string renterId);
+
         void ChangeVisibility(int carId);
 
         IEnumerable<string> AllBrands();

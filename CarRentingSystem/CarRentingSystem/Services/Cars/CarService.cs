@@ -132,6 +132,9 @@
         public bool IsByDealer(int carId, int dealerId)
               => this.data.Cars.Any(c => c.Id == carId && c.DealerId == dealerId);
 
+        public bool IsRentedByUserWithId(int carId, string renterId)
+              => this.data.Cars.Any(c => c.Id == carId && c.RenterId != null && c.RenterId == renterId);
+
         public void ChangeVisibility(int carId)
         {
             var car = this.data.Cars.Find(carId);

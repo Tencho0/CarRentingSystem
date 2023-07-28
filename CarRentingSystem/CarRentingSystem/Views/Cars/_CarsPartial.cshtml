@@ -1,4 +1,13 @@
-﻿@model IEnumerable<CarServiceModel>
+﻿@using CarRentingSystem.Services.Cars
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using CarRentingSystem.Data.Models
+@model IEnumerable<CarServiceModel>
+
+@inject IDealerService DealerService
+@inject ICarService CarService
+@{
+    // bool isAgentOwnerOfTheHouse = await DealerService.HasHouseWithIdAsync(User.GetId(), Model.Id);
+}
 
 <div class="row">
     @foreach (var car in Model)
@@ -30,6 +39,35 @@
                            class="btn btn-danger">
                             Delete
                         </a>
+                    }
+                    @if (User.Id() != null)
+                    {
+                        bool isUserDealer = DealerService.IsDealer(User.Id()!);
+                        bool isCarRentedByUserWithId = CarService.IsRentedByUserWithId(car.Id, User.Id()!);
+
+                        @if (car.RenterId == null)
+                        {
+                            @if (!isUserDealer || User.IsAdmin())
+                            {
+                                <form class="input-group-sm"
+                                      asp-controller="Cars"
+                                      asp-action="Rent"
+                                      asp-route-id="@car.Id" method="post">
+                                    <input class="btn btn-primary" type="submit" value="Rent" />
+                                </form>
+                            }
+                        }
+                        else
+                        {
+                            @if (!isUserDealer && isCarRentedByUserWithId)
+                            {
+                                <form asp-controller="Cars"
+                                      asp-action="Leave"
+                                      asp-route-id="@car.Id" method="post">
+                                    <input class="btn btn-primary" type="submit" value="Leave" />
+                                </form>
+                            }
+                        }
                     }
                 </div>
             </div>

@@ -27,7 +27,7 @@
                 latestCars = this.cars.Latest().ToList();
 
                 var cacheOptions = new MemoryCacheEntryOptions()
-                    .SetAbsoluteExpiration(TimeSpan.FromMinutes(15));
+                    .SetAbsoluteExpiration(TimeSpan.FromMinutes(3));
 
                 this.cache.Set(LatestCarsCacheKey, latestCars, cacheOptions);
             }

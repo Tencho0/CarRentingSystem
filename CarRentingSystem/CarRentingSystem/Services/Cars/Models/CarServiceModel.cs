@@ -1,5 +1,7 @@
 ﻿namespace CarRentingSystem.Services.Cars.Models
 {
+    using CarRentingSystem.Data.Models;
+
     public class CarServiceModel : ICarModel
     {
         public int Id { get; set; }
@@ -15,5 +17,9 @@
         public string CategoryName { get; set; } = null!;
 
         public bool IsPublic { get; init; }
+
+        public string? RenterId { get; set; }
+
+        public virtual User? Renter { get; set; }
     }
 }
