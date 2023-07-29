@@ -225,11 +225,11 @@
 
             return RedirectToAction("Mine", "Cars");
         }
-
+        
         [HttpPost]
-        public IActionResult ReturnCar(int carId)
+        public IActionResult ReturnCar(int id)
         {
-            bool carExists = cars.ExistsById(carId);
+            bool carExists = cars.ExistsById(id);
             if (!carExists)
             {
                 TempData[ErrorMessage] = "Car with provided id does not exist! Please try again!";
@@ -237,7 +237,7 @@
                 return RedirectToAction("All", "Cars");
             }
 
-            bool isCarRented = cars.IsRented(carId);
+            bool isCarRented = cars.IsRented(id);
             if (!isCarRented)
             {
                 TempData[ErrorMessage] = "Selected car is not rented!";
@@ -245,7 +245,7 @@
                 return RedirectToAction("Mine", "Cars");
             }
 
-            bool isCurrentUserRenterOfTheCar = cars.IsRentedByUserWithId(carId, User.Id()!);
+            bool isCurrentUserRenterOfTheCar = cars.IsRentedByUserWithId(id, User.Id()!);
             if (!isCurrentUserRenterOfTheCar)
             {
                 TempData[ErrorMessage] =
@@ -256,7 +256,7 @@
 
             try
             {
-                cars.ReturnCar(carId);
+                cars.ReturnCar(id);
             }
             catch (Exception)
             {

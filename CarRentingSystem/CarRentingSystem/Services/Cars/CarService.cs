@@ -190,7 +190,7 @@
                 .First(u => u.Id == renterId).RentedCars
                 .Remove(car);
 
-            data.SaveChangesAsync();
+            data.SaveChanges();
         }
     }
 }
