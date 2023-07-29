@@ -9,7 +9,8 @@
     using Models;
     using CarRentingSystem.Data.Models;
     using CarRentingSystem.Models;
-    
+    using Microsoft.EntityFrameworkCore;
+
     public class CarService : ICarService
     {
         private readonly CarRentingDbContext data;
@@ -29,7 +30,8 @@
             int carsPerPage = int.MaxValue,
             bool publicOnly = true)
         {
-            var carsQuery = this.data.Cars.Where(c => !publicOnly || c.IsPublic);
+            var carsQuery = this.data.Cars
+                .Where(c => !c.IsDeleted && (!publicOnly || c.IsPublic));
 
             if (!string.IsNullOrWhiteSpace(brand))
             {
@@ -66,7 +68,7 @@
 
         public IEnumerable<LatestCarServiceModel> Latest()
               => this.data.Cars
-                .Where(c => c.IsPublic)
+                .Where(c => c.IsPublic && !c.IsDeleted)
                 .OrderByDescending(x => x.Id)
                 .ProjectTo<LatestCarServiceModel>(this.mapper.ConfigurationProvider)
                 .Take(3)
@@ -126,8 +128,28 @@
             return true;
         }
 
+        public CarDetailsServiceModel GetCarForDeleteById(int id)
+        {
+            return this.data.Cars
+                .Where(c => !c.IsDeleted)
+                .ProjectTo<CarDetailsServiceModel>(this.mapper.ConfigurationProvider)
+                .First(c => c.Id == id);
+        }
+
+        public void DeleteCarById(int id)
+        {
+            Car carToDelete = this.data.Cars
+                .Where(c => !c.IsDeleted)
+                .First(c => c.Id == id);
+
+            carToDelete.IsDeleted = true;
+            carToDelete.IsPublic = false;
+
+            this.data.SaveChanges();
+        }
+
         public IEnumerable<CarServiceModel> ByUser(string userId)
-              => GetCars(this.data.Cars.Where(c => c.Dealer.UserId == userId));
+              => GetCars(this.data.Cars.Where(c => c.Dealer.UserId == userId && !c.IsDeleted));
 
         public bool IsRented(int carId)
             => this.data.Cars.Any(c => c.Id == carId && c.RenterId != null);
@@ -149,6 +171,7 @@
 
         public IEnumerable<string> AllBrands()
               => this.data.Cars
+                        .Where(c => c.IsPublic && !c.IsDeleted)
                         .Select(c => c.Brand)
                         .Distinct()
                         .OrderBy(br => br)
@@ -156,7 +179,7 @@
 
         public IEnumerable<CarCategoryServiceModel> AllCategories()
               => this.data.Categories
-                  .ProjectTo<CarCategoryServiceModel>(this.mapper.ConfigurationProvider)
+                    .ProjectTo<CarCategoryServiceModel>(this.mapper.ConfigurationProvider)
                     .ToList();
 
         private IEnumerable<CarServiceModel> GetCars(IQueryable<Car> carQuery)

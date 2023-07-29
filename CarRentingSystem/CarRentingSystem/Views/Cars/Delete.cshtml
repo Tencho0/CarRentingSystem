@@ -1,0 +1,31 @@
+﻿@model CarRentingSystem.Services.Cars.Models.CarDetailsServiceModel
+
+@{
+    ViewBag.Title = "Delete Car";
+}
+
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+    <h1 style="text-align: center; margin-top: 20px;">@ViewBag.Title</h1>
+
+    <div style="background-color: #f5f5f5; padding: 10px; margin-top: 20px;">
+        <h3>Car Information</h3>
+        <p><strong>Brand:</strong> @Model.Brand</p>
+        <p><strong>Model:</strong> @Model.Model</p>
+        <p><strong>Description:</strong> @Model.Description</p>
+        <p><strong>Category:</strong> @Model.CategoryName</p>
+    </div>
+
+    <div style="background-color: #f5f5f5; padding: 10px; margin-top: 20px;">
+        <h3>Dealer Information</h3>
+        <p><strong>Name:</strong> @Model.DealerName</p>
+    </div>
+    
+    <form method="post" action="@Url.Action("Delete", "Cars", new { id = Model.Id })" style="margin-top: 20px;">
+        @Html.AntiForgeryToken()
+
+        <div style="text-align: center;">
+            <button type="submit" class="btn btn-danger">Confirm Delete</button>
+            <a href="@Url.Action("Mine", "Cars", new { id = Model.Id })" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>

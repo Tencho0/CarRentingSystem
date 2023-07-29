@@ -26,6 +26,8 @@
 
         public bool IsPublic { get; set; }
 
+        public bool IsDeleted { get; set; } = false;
+
         public int CategoryId { get; set; }
 
         public virtual Category Category { get; init; } = null!;

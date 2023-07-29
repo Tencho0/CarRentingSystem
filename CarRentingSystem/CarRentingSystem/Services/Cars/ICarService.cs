@@ -36,6 +36,10 @@
             int categoryId,
             bool isPublic);
 
+        CarDetailsServiceModel GetCarForDeleteById(int id);
+
+        void DeleteCarById(int id);
+
         IEnumerable<CarServiceModel> ByUser(string userId);
 
         bool IsRented(int carId);

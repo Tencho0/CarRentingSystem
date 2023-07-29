@@ -4,9 +4,6 @@
 
 @inject IDealerService DealerService
 @inject ICarService CarService
-@{
-    // bool isAgentOwnerOfTheCar =  DealerService.HasCarWithId(User.GetId(), Model.Id);
-}
 
 <div class="row">
     @foreach (var car in Model)
@@ -61,7 +58,7 @@
                             @if (!isUserDealer && isCarRentedByUserWithId)
                             {
                                 <form class="input-group-sm"
-                                    asp-controller="Cars"
+                                      asp-controller="Cars"
                                       asp-action="ReturnCar"
                                       asp-route-id="@car.Id" method="post">
                                     <input class="btn btn-primary" type="submit" value="ReturnCar" />

@@ -11,6 +11,8 @@
 
     using static WebConstants;
     using static WebConstants.NotificationMessagesConstants;
+    using Microsoft.EntityFrameworkCore;
+    using CarRentingSystem.Services.Cars.Models;
 
     public class CarsController : Controller
     {
@@ -186,6 +188,90 @@
             });
         }
 
+        [HttpGet]
+        public IActionResult Delete(int id)
+        {
+            bool carExists = this.cars.ExistsById(id);
+            if (!carExists)
+            {
+                TempData[ErrorMessage] = "Car with the provided Id does not exist!";
+
+                return RedirectToAction("All", "Cars");
+            }
+
+            bool isUserDealer = this.dealers.IsDealer(User.Id()!);
+            if (!isUserDealer && !User.IsAdmin())
+            {
+                TempData[ErrorMessage] = "You must become a Dealer in order to edit or delete car info!";
+
+                return RedirectToAction("Become", "Dealers");
+            }
+
+            int dealerId = this.dealers.IdByUser(User.Id()!);
+            bool isDealerOwner = this.cars.IsByDealer(id, dealerId);
+            if (!isDealerOwner && !User.IsAdmin())
+            {
+                TempData[ErrorMessage] = 
+                    "You must be the Dealer Owner of the car you want to edit or delete!";
+
+                return RedirectToAction("Mine", "Cars");
+            }
+
+            try
+            {
+                CarDetailsServiceModel viewModel = this.cars.GetCarForDeleteById(id);
+
+                return View(viewModel);
+            }
+            catch (Exception)
+            {
+                return GeneralError();
+            }
+        }
+
+        [HttpPost]
+        [Authorize]
+        public IActionResult Delete(int id, CarDetailsServiceModel model)
+        {
+            bool carExists = this.cars.ExistsById(id);
+            if (!carExists)
+            {
+                TempData[ErrorMessage] = "Car with the provided Id does not exist!";
+
+                return RedirectToAction("All", "Cars");
+            }
+
+            bool isUserDealer = this.dealers.IsDealer(User.Id()!);
+            if (!isUserDealer && !User.IsAdmin())
+            {
+                TempData[ErrorMessage] = "You must become a Dealer in order to edit or delete car info!";
+
+                return RedirectToAction("Become", "Dealers");
+            }
+
+            int dealerId = this.dealers.IdByUser(User.Id()!);
+            bool isDealerOwner = this.cars.IsByDealer(id, dealerId);
+            if (!isDealerOwner && !User.IsAdmin())
+            {
+                TempData[ErrorMessage] =
+                    "You must be the Dealer Owner of the car you want to edit or delete!";
+
+                return RedirectToAction("Mine", "Cars");
+            }
+
+            try
+            {
+                this.cars.DeleteCarById(id);
+
+                TempData[WarningMessage] = "The car was successfully deleted!";
+                return RedirectToAction("Mine", "Cars");
+            }
+            catch (Exception)
+            {
+                return GeneralError();
+            }
+        }
+
         [HttpPost]
         public IActionResult Rent(int id)
         {
@@ -197,8 +283,8 @@
                 return RedirectToAction("All", "Cars");
             }
 
-            bool isHouseRented = this.cars.IsRented(id);
-            if (isHouseRented)
+            bool isCarRented = this.cars.IsRented(id);
+            if (isCarRented)
             {
                 TempData[ErrorMessage] =
                     "Selected Car is already rented by another user! Please select another Car.";
