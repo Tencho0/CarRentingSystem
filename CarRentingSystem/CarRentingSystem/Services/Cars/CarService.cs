@@ -74,11 +74,11 @@
                 .Take(3)
                 .ToList();
 
-        public CarDetailsServiceModel Details(int id)
+        public CarDetailsServiceModel? Details(int id)
               => this.data.Cars
                         .Where(c => c.Id == id)
                         .ProjectTo<CarDetailsServiceModel>(this.mapper.ConfigurationProvider)
-                        .FirstOrDefault()!;
+                        .FirstOrDefault();
 
         public int Create(string brand, string model, string description, string imageUrl, int year, int categoryId, int dealerId)
         {

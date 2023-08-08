@@ -53,7 +53,7 @@
         {
             var car = this.cars.Details(id);
 
-            if (information != car.GetInformation())
+            if (car == null || information != car.GetInformation())
             {
                 return BadRequest();
             }
@@ -79,7 +79,7 @@
         [Authorize]
         public IActionResult Add(CarFormModel car)
         {
-            var dealerId = this.dealers.IdByUser(this.User.Id());
+            var dealerId = this.dealers.IdByUser(this.User.Id()!);
 
             if (dealerId == 0)
             {
@@ -211,7 +211,7 @@
             bool isDealerOwner = this.cars.IsByDealer(id, dealerId);
             if (!isDealerOwner && !User.IsAdmin())
             {
-                TempData[ErrorMessage] = 
+                TempData[ErrorMessage] =
                     "You must be the Dealer Owner of the car you want to edit or delete!";
 
                 return RedirectToAction("Mine", "Cars");
@@ -311,7 +311,7 @@
 
             return RedirectToAction("Mine", "Cars");
         }
-        
+
         [HttpPost]
         public IActionResult ReturnCar(int id)
         {

@@ -15,7 +15,7 @@
 
         IEnumerable<LatestCarServiceModel> Latest();
 
-        CarDetailsServiceModel Details(int carId);
+        CarDetailsServiceModel? Details(int carId);
 
         int Create(
             string brand,

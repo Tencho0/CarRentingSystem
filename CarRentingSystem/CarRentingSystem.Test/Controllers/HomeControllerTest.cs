@@ -12,6 +12,9 @@
 
     using static Data.Cars;
     using static CarRentingSystem.WebConstants.Cache;
+    using Microsoft.AspNetCore.Routing;
+    using MyTested.AspNetCore.Mvc;
+    using CarRentingSystem.Services.Statistics;
 
     public class HomeControllerTest
     {
