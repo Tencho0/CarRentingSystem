@@ -1,4 +1,6 @@
-﻿namespace CarRentingSystem.Controllers
+﻿using CarRentingSystem.Services.Dealers;
+
+namespace CarRentingSystem.Controllers
 {
     using CarRentingSystem.Data;
     using CarRentingSystem.Data.Models;
@@ -11,10 +13,12 @@
 
     public class DealersController : Controller
     {
-        private readonly CarRentingDbContext data;
+        private readonly IDealerService dealers;
 
-        public DealersController(CarRentingDbContext data)
-            => this.data = data;
+        public DealersController(IDealerService dealers)
+        {
+            this.dealers = dealers;
+        }
 
         [Authorize]
         public IActionResult Become() => View();
@@ -23,9 +27,8 @@
         [Authorize]
         public IActionResult Become(BecomeDealerFromModel dealer)
         {
-            var userId = this.User.Id();
-            var userIdAlreadyDealer = this.data.Dealers
-                .Any(d => d.UserId == userId);
+            var userId = this.User.Id()!;
+            var userIdAlreadyDealer = this.dealers.IsDealer(userId);
 
             if (userIdAlreadyDealer)
             {
@@ -37,16 +40,8 @@
                 return View(dealer);
             }
 
-            var dealerData = new Dealer
-            {
-                Name = dealer.Name,
-                PhoneNumber = dealer.PhoneNumber,
-                UserId = userId!,
-            };
-
-            this.data.Add(dealerData);
-            this.data.SaveChanges();
-
+            this.dealers.CreateDealer(userId, dealer.Name, dealer.PhoneNumber);
+            
             TempData[GlobalMessageKey] = "Thank you for becoming a dealer!";
 
             return RedirectToAction("All", "Cars");

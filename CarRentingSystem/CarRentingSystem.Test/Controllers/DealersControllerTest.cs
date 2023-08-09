@@ -1,16 +1,19 @@
 ﻿namespace CarRentingSystem.Test.Controllers
 {
     using System.Security.Claims;
-    using CarRentingSystem.Controllers;
-    using CarRentingSystem.Models.Dealers;
-    using CarRentingSystem.Test.Mock;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.ViewFeatures;
+    
     using Moq;
-    using MyTested.AspNetCore.Mvc;
+    using Mock;
     using Xunit;
+    using Services.Dealers;
+    using MyTested.AspNetCore.Mvc;
+
+    using Models.Dealers;
+    using CarRentingSystem.Controllers;
 
     public class DealersControllerTest
     {
@@ -20,7 +23,8 @@
             // Arrange
 
             var data = DatabaseMock.Instance;
-            var controller = new DealersController(data);
+            var dealersService = new DealerService(data);
+            var controller = new DealersController(dealersService);
             // Act
             var result = controller.Become();
 
@@ -38,14 +42,15 @@
         {
             // Arrange
             var data = DatabaseMock.Instance;
-            var controller = new DealersController(data);
+            var dealersService = new DealerService(data);
+            var controller = new DealersController(dealersService);
             controller.ControllerContext = new ControllerContext();
             controller.ControllerContext.HttpContext = new DefaultHttpContext();
             controller.ControllerContext.HttpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] { new Claim(ClaimTypes.NameIdentifier, TestUser.Identifier) }));
-            
+
             var tempDataMock = new Mock<ITempDataDictionary>();
             controller.TempData = tempDataMock.Object;
-            
+
             var result = controller.Become(new BecomeDealerFromModel
             {
                 Name = dealerName,

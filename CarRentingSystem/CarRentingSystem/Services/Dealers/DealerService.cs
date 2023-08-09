@@ -1,6 +1,7 @@
 ﻿namespace CarRentingSystem.Services.Dealers
 {
-    using CarRentingSystem.Data;
+    using Data;
+    using CarRentingSystem.Data.Models;
 
     public class DealerService : IDealerService
     {
@@ -17,5 +18,18 @@
 
         public bool IsDealer(string userId)
          => this.data.Dealers.Any(d => d.UserId == userId);
+
+        public void CreateDealer(string userId, string name, string phoneNumber)
+        {
+            var dealerData = new Dealer
+            {
+                Name = name,
+                PhoneNumber = phoneNumber,
+                UserId = userId,
+            };
+
+            this.data.Add(dealerData);
+            this.data.SaveChanges();
+        }
     }
 }

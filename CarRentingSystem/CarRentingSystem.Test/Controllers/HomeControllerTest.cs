@@ -1,20 +1,17 @@
 ﻿namespace CarRentingSystem.Test.Controllers
 {
-    using CarRentingSystem.Controllers;
-    using CarRentingSystem.Data.Models;
-    using CarRentingSystem.Services.Cars;
-    using CarRentingSystem.Services.Cars.Models;
-    using CarRentingSystem.Test.Mock;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Caching.Memory;
-    using Moq;
+
+    using Mock;
     using Xunit;
 
+    using Services.Cars;
+    using CarRentingSystem.Controllers;
+    using CarRentingSystem.Data.Models;
+    using CarRentingSystem.Services.Cars.Models;
+
     using static Data.Cars;
-    using static CarRentingSystem.WebConstants.Cache;
-    using Microsoft.AspNetCore.Routing;
-    using MyTested.AspNetCore.Mvc;
-    using CarRentingSystem.Services.Statistics;
 
     public class HomeControllerTest
     {

@@ -1,24 +1,21 @@
-﻿using CarRentingSystem.Controllers;
-using CarRentingSystem.Services.Cars;
-using CarRentingSystem.Models.Cars;
-using CarRentingSystem.Services.Dealers;
-using Xunit;
-using Moq;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
-using System.Security.Claims;
-using CarRentingSystem.Models;
-using CarRentingSystem.Services.Cars.Models;
-using CarRentingSystem.Test.Mock;
-using MyTested.AspNetCore.Mvc;
-using CarRentingSystem.Data.Models;
-using AutoMapper;
-using CarRentingSystem.Areas.Admin.Controller;
-using CarsController = CarRentingSystem.Controllers.CarsController;
-using CarRentingSystem.Test.Data;
-
-namespace CarRentingSystem.Test.Controllers
+﻿namespace CarRentingSystem.Test.Controllers
 {
+    using System.Security.Claims;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Mvc;
+
+    using Mock;
+    using Moq;
+    using Xunit;
+
+    using Models;
+    using Models.Cars;
+    using Services.Cars;
+    using Services.Cars.Models;
+    using Services.Dealers;
+
+    using CarsController = CarRentingSystem.Controllers.CarsController;
+
     public class CarsControllerTests
     {
         [Fact]
@@ -288,7 +285,7 @@ namespace CarRentingSystem.Test.Controllers
 
         //    var carService = new CarService(data, mapper);
         //    var dealerService = new DealerService(data);
-            
+
         //    var car = Cars.OneCarWithId1();
 
         //    data.Cars.Add(car);
