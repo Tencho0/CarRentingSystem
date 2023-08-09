@@ -15,6 +15,7 @@ using CarRentingSystem.Data.Models;
 using AutoMapper;
 using CarRentingSystem.Areas.Admin.Controller;
 using CarsController = CarRentingSystem.Controllers.CarsController;
+using CarRentingSystem.Test.Data;
 
 namespace CarRentingSystem.Test.Controllers
 {
@@ -243,15 +244,6 @@ namespace CarRentingSystem.Test.Controllers
         //    //Assert.Equal(1, result.RouteValues["id"]);
         //}
 
-
-
-
-
-        //// Add more test methods for other actions in the CarsController.
-        //// You can mock the dependencies (carServiceMock and dealerServiceMock) and set up their behavior
-        //// based on the scenarios you want to test.
-
-        //// Example test method for the Add action:
         //[Fact]
         //public void Add_Post_ShouldRedirectToDetails_WhenModelStateIsValid()
         //{
@@ -286,6 +278,43 @@ namespace CarRentingSystem.Test.Controllers
         //    var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
         //    Assert.Equal("Details", redirectToActionResult.ActionName);
         //    // Add more assertions based on the expected behavior of the Add action.
+        //}
+
+        //[Fact]
+        //public void Edit_Get_WithValidId_ShouldReturnViewWithCarFormModel()
+        //{
+        //    var mapper = MapperMock.Instance;
+        //    var data = DatabaseMock.Instance;
+
+        //    var carService = new CarService(data, mapper);
+        //    var dealerService = new DealerService(data);
+            
+        //    var car = Cars.OneCarWithId1();
+
+        //    data.Cars.Add(car);
+        //    data.Users.Add(Users.OneUser());
+        //    data.Dealers.Add(Dealers.OneDealer());
+        //    data.SaveChanges();
+
+        //    var carsController = new CarsController(carService, dealerService, mapper);
+        //    var httpContext = new DefaultHttpContext();
+        //    httpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+        //    {
+        //        new Claim(ClaimTypes.NameIdentifier, "testUserId")
+        //    }));
+
+        //    carsController.ControllerContext = new ControllerContext
+        //    {
+        //        HttpContext = httpContext
+        //    };
+
+        //    var result = carsController.Edit(car.Id);
+
+        //    var viewResult = Assert.IsType<ViewResult>(result);
+        //    var model = Assert.IsAssignableFrom<CarFormModel>(viewResult.ViewData.Model);
+        //    Assert.NotNull(model);
+        //    Assert.Equal("Toyota", model.Brand);
+        //    Assert.Equal("Camry", model.Model);
         //}
     }
 }

@@ -13,5 +13,16 @@
                 ImageUrl = "https://www.driving.co.uk/wp-content/uploads/sites/5/2014/08/BMWM4.jpg",
                 IsPublic = true
             });
+
+        public static Car OneCarWithId1()
+            => new Car
+            {
+                Id = 1,
+                Brand = "BMW",
+                Model = "M4 coupe",
+                Description = "Very fast Bmw m4 coupe",
+                ImageUrl = "https://www.driving.co.uk/wp-content/uploads/sites/5/2014/08/BMWM4.jpg",
+                IsPublic = true
+            };
     }
 }

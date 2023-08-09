@@ -118,7 +118,7 @@
         [Authorize]
         public IActionResult Edit(int id)
         {
-            var userId = this.User.Id();
+            var userId = this.User.Id()!;
 
             if (!this.dealers.IsDealer(userId) && !User.IsAdmin())
             {
@@ -126,6 +126,12 @@
             }
 
             var car = this.cars.Details(id);
+
+            if (car == null)
+            {
+                return BadRequest();
+            }
+
             if (car.UserId != userId && !User.IsAdmin())
             {
                 return Unauthorized();

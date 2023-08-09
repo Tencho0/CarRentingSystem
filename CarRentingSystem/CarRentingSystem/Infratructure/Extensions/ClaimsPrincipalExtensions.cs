@@ -2,7 +2,7 @@
 {
     using System.Security.Claims;
 
-    using static CarRentingSystem.Areas.Admin.AdminConstants;
+    using static Areas.Admin.AdminConstants;
 
     public static class ClaimsPrincipalExtensions
     {
