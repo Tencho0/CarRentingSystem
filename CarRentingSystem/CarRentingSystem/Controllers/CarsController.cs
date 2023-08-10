@@ -120,7 +120,7 @@ namespace CarRentingSystem.Controllers
         {
             var userId = this.User.Id()!;
 
-            if (!this.dealers.IsDealer(userId) && !User.IsAdmin())
+            if (!this.dealers.IsDealer(userId) && !this.User.IsAdmin())
             {
                 return RedirectToAction(nameof(DealersController.Become), "Dealers");
             }
@@ -132,7 +132,7 @@ namespace CarRentingSystem.Controllers
                 return BadRequest();
             }
 
-            if (car.UserId != userId && !User.IsAdmin())
+            if (car.UserId != userId && !this.User.IsAdmin())
             {
                 return Unauthorized();
             }

@@ -15,6 +15,9 @@
     using Services.Models.Cars;
 
     using CarsController = CarRentingSystem.Controllers.CarsController;
+    using CarRentingSystem.Controllers;
+    using Microsoft.AspNetCore.Mvc.ViewFeatures;
+    using CarRentingSystem.Infrastructure.Extensions;
 
     public class CarsControllerTests
     {
@@ -173,145 +176,436 @@
             Assert.Equal("Dealers", redirectResult.ControllerName);
         }
 
-        //[Fact]
-        //public void AddPostWithValidModelShouldCreateCarAndRedirectToDetails()
-        //{
-        //    var carServiceMock = new Mock<ICarService>();
-        //    var dealerServiceMock = new Mock<IDealerService>();
-        //    var mapperMock = new Mock<IMapper>();
+        [Fact]
+        public void Edit_Get_WithValidId_ShouldReturnViewWithCarFormModel()
+        {
+            var mapper = MapperMock.Instance;
+            var carServiceMock = new Mock<ICarService>();
+            var dealerServiceMock = new Mock<IDealerService>();
+            var carsController = new CarsController(carServiceMock.Object, dealerServiceMock.Object, mapper);
+            var userId = "testUserId";
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, userId)
+            };
+            var identity = new ClaimsIdentity(claims, "TestAuthType");
+            var claimsPrincipal = new ClaimsPrincipal(identity);
+            carsController.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext { User = claimsPrincipal }
+            };
+            var carId = 1;
 
-        //    var carFormModel = new CarFormModel
-        //    {
-        //        Brand = "TestBrand",
-        //        Model = "TestModel",
-        //        Description = "TestDescription",
-        //        ImageUrl = "test.jpg",
-        //        Year = 2023,
-        //        CategoryId = 1,
-        //        Categories = new List<CarCategoryServiceModel>(),
-        //    };
+            carServiceMock.Setup(c => c.Details(carId))
+                .Returns(new CarDetailsServiceModel
+                {
+                    Id = carId,
+                    Brand = "Toyota",
+                    Model = "Camry",
+                    Year = 2020,
+                    UserId = userId,
 
-        //    var controller = new CarsController(carServiceMock.Object, dealerServiceMock.Object, mapperMock.Object);
+                });
+            dealerServiceMock.Setup(d => d.IsDealer(It.IsAny<string>())).Returns(true);
 
-        //    // Set up the ControllerContext with a mock HttpContext
-        //    var httpContext = new DefaultHttpContext();
-        //    httpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
-        //    {
-        //        new Claim(ClaimTypes.NameIdentifier, "testUserId")
-        //    }));
+            var result = carsController.Edit(carId);
 
-        //    controller.ControllerContext = new ControllerContext
-        //    {
-        //        HttpContext = httpContext
-        //    };
+            // Assert
+            var viewResult = Assert.IsType<ViewResult>(result);
+            var model = Assert.IsAssignableFrom<CarFormModel>(viewResult.ViewData.Model);
+            Assert.NotNull(model);
+            Assert.Equal("Toyota", model.Brand);
+            Assert.Equal("Camry", model.Model);
+            Assert.Equal(2020, model.Year);
+        }
 
-        //    dealerServiceMock.Setup(d => d.IdByUser(It.IsAny<string>())).Returns(1);
-        //    carServiceMock.Setup(c => c.CategoryExists(It.IsAny<int>())).Returns(true);
-        //    carServiceMock.Setup(c => c.Create(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>())).Returns(1);
+        [Fact]
+        public void Edit_Get_WithInvalidUserId_ShouldReturnViewWithCarFormModel()
+        {
+            var mapper = MapperMock.Instance;
+            var carServiceMock = new Mock<ICarService>();
+            var dealerServiceMock = new Mock<IDealerService>();
+            var carsController = new CarsController(carServiceMock.Object, dealerServiceMock.Object, mapper);
+            var userId = "testUserId";
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, userId)
+            };
+            var identity = new ClaimsIdentity(claims, "TestAuthType");
+            var claimsPrincipal = new ClaimsPrincipal(identity);
+            carsController.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext { User = claimsPrincipal }
+            };
+            var carId = 1;
+
+            carServiceMock.Setup(c => c.Details(carId))
+                .Returns(new CarDetailsServiceModel
+                {
+                    Id = carId,
+                    Brand = "Toyota",
+                    Model = "Camry",
+                    Year = 2020,
+                    UserId = userId,
+
+                });
+            dealerServiceMock.Setup(d => d.IsDealer(It.IsAny<string>())).Returns(false);
+
+            var result = carsController.Edit(carId) as RedirectToActionResult;
+
+            Assert.NotNull(result);
+            Assert.Equal(nameof(DealersController.Become), result.ActionName);
+            Assert.Equal("Dealers", result.ControllerName);
+        }
+
+        [Fact]
+        public void Edit_Get_WithInvalidCarId_ShouldReturnBadRequest()
+        {
+            var mapper = MapperMock.Instance;
+            var carServiceMock = new Mock<ICarService>();
+            var dealerServiceMock = new Mock<IDealerService>();
+            var carsController = new CarsController(carServiceMock.Object, dealerServiceMock.Object, mapper);
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, "testUserId")
+            };
+            var identity = new ClaimsIdentity(claims, "TestAuthType");
+            var claimsPrincipal = new ClaimsPrincipal(identity);
+            carsController.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext { User = claimsPrincipal }
+            };
+            dealerServiceMock.Setup(d => d.IsDealer(It.IsAny<string>())).Returns(true);
+
+            var carId = 1;
+
+            var result = carsController.Edit(carId);
+
+            Assert.IsType<BadRequestResult>(result);
+        }
+
+        [Fact]
+        public void Edit_Get_WithInvalidUserId_ShouldReturnUnauthorized()
+        {
+            var mapper = MapperMock.Instance;
+            var carServiceMock = new Mock<ICarService>();
+            var dealerServiceMock = new Mock<IDealerService>();
+            var carsController = new CarsController(carServiceMock.Object, dealerServiceMock.Object, mapper);
+
+            var userId = "testUserId";
+            var invalidUserId = "invalidUserId";
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, userId)
+            };
+            var identity = new ClaimsIdentity(claims, "TestAuthType");
+            var claimsPrincipal = new ClaimsPrincipal(identity);
+            carsController.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext { User = claimsPrincipal }
+            };
+
+            var carId = 1;
+
+            carServiceMock.Setup(c => c.Details(carId))
+                .Returns(new CarDetailsServiceModel
+                {
+                    Id = carId,
+                    Brand = "Toyota",
+                    Model = "Camry",
+                    Year = 2020,
+                    UserId = invalidUserId,
+
+                });
+            dealerServiceMock.Setup(d => d.IsDealer(It.IsAny<string>())).Returns(true);
+
+            var result = carsController.Edit(carId);
+
+            Assert.IsType<UnauthorizedResult>(result);
+        }
+
+        [Fact]
+        public void Edit_WithValidModel_ShouldUpdateCarAndRedirectToDetails()
+        {
+            var mapper = MapperMock.Instance;
+            var carServiceMock = new Mock<ICarService>();
+            var dealerServiceMock = new Mock<IDealerService>();
+            var tempDataMock = new Mock<ITempDataDictionary>();  // Create a mock for ITempDataDictionary
+            var carsController = new CarsController(carServiceMock.Object, dealerServiceMock.Object, mapper);
+            carsController.TempData = tempDataMock.Object;
+            var userId = "testUserId";
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, userId),
+                new Claim(ClaimTypes.Role, "Administrator")
+            };
+            var identity = new ClaimsIdentity(claims, "TestAuthType");
+            var claimsPrincipal = new ClaimsPrincipal(identity);
+            carsController.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext { User = claimsPrincipal }
+            };
 
 
-        //    var result = controller.Add(carFormModel);
+            var carId = 1;
+            var dealerId = 1;
 
-        //    // Assert
-        //    carServiceMock.Verify(c => c.Create(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<int>()), Times.Once);
+            var carFormModel = new CarFormModel
+            {
+                Brand = "Toyota",
+                Model = "Camry",
+                Description = "A popular sedan model",
+                ImageUrl = "https://example.com/toyota.jpg",
+                Year = 2022,
+                CategoryId = 1
+            };
 
-        //    var redirectResult = Assert.IsType<RedirectToActionResult>(result);
-        //    Assert.Equal("Details", redirectResult.ActionName);
-        //    Assert.Equal("Cars", redirectResult.ControllerName);
+            dealerServiceMock
+                .Setup(c => c.IdByUser(It.IsAny<string>()))
+                .Returns(dealerId);
+            carServiceMock
+                .Setup(c => c.CategoryExists(It.IsAny<int>()))
+                .Returns(true);
+            carServiceMock
+                .Setup(c => c.IsByDealer(It.IsAny<int>(), It.IsAny<int>()))
+                .Returns(true);
+            carServiceMock
+                .Setup(c => c.Edit(carId,
+                        carFormModel.Brand,
+                        carFormModel.Model,
+                        carFormModel.Description,
+                        carFormModel.ImageUrl,
+                        carFormModel.Year,
+                        carFormModel.CategoryId,
+                        It.IsAny<bool>()))
+                .Returns(true);
 
-        //    // Check TempData content
-        //    //Assert.True(controller.TempData.ContainsKey(GlobalMessageKey));
-        //    //Assert.Equal("Your car was added successfully and is awaiting for approval!", controller.TempData[GlobalMessageKey]);
+            var result = carsController.Edit(carId, carFormModel);
+
+            carServiceMock.Verify(c => c.Edit(
+                carId,
+                carFormModel.Brand,
+                carFormModel.Model,
+                carFormModel.Description,
+                carFormModel.ImageUrl,
+                carFormModel.Year,
+                carFormModel.CategoryId,
+                true
+            ), Times.Once);
+
+            var redirectResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("Details", redirectResult.ActionName);
+
+            object expectedRouteValues = new
+            {
+                id = carId,
+                information = carFormModel.GetInformation()
+            };
+
+            // Convert actual RouteValueDictionary to an anonymous object for comparison
+            var actualRouteValues = new
+            {
+                id = (int)redirectResult.RouteValues["id"],
+                information = (string)redirectResult.RouteValues["information"]
+            };
+
+            Assert.Equal(expectedRouteValues, actualRouteValues);
+        }
+
+        [Fact]
+        public void Edit_WithInvalidDealerId_ShouldRedirectToBecome()
+        {
+            var mapper = MapperMock.Instance;
+            var carServiceMock = new Mock<ICarService>();
+            var dealerServiceMock = new Mock<IDealerService>();
+            var carsController = new CarsController(carServiceMock.Object, dealerServiceMock.Object, mapper);
+
+            var userId = "testUserId";
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, userId),
+            };
+            var identity = new ClaimsIdentity(claims, "TestAuthType");
+            var claimsPrincipal = new ClaimsPrincipal(identity);
+            carsController.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext { User = claimsPrincipal }
+            };
+
+            var carId = 1;
+            var invalidDealerId = 0;
+
+            var carFormModel = new CarFormModel
+            {
+                Brand = "Toyota",
+                Model = "Camry",
+                Description = "A popular sedan model",
+                ImageUrl = "https://example.com/toyota.jpg",
+                Year = 2022,
+                CategoryId = 1
+            };
+
+            dealerServiceMock
+                .Setup(c => c.IdByUser(It.IsAny<string>()))
+                .Returns(invalidDealerId);
+
+            var result = carsController.Edit(carId, carFormModel);
+
+            var redirectResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("Become", redirectResult.ActionName);
+            Assert.Equal("Dealers", redirectResult.ControllerName);
 
 
-        //    // Act
-        //    //var result = controller.Add(carFormModel) as RedirectToActionResult;
+        }
 
-        //    //carServiceMock.Verify(c => c.Create(
-        //    //    carFormModel.Brand,
-        //    //    carFormModel.Model,
-        //    //    carFormModel.Description,
-        //    //    carFormModel.ImageUrl,
-        //    //    carFormModel.Year,
-        //    //    carFormModel.CategoryId,
-        //    //    1), Times.Once);
+        [Fact]
+        public void Edit_WithInvalidCarCategory_ShouldAddModelError()
+        {
+            var mapper = MapperMock.Instance;
+            var carServiceMock = new Mock<ICarService>();
+            var dealerServiceMock = new Mock<IDealerService>();
+            var carsController = new CarsController(carServiceMock.Object, dealerServiceMock.Object, mapper);
 
-        //    //Assert.NotNull(result);
-        //    //Assert.Equal("Details", result.ActionName);
-        //    //Assert.Equal(1, result.RouteValues["id"]);
-        //}
+            var userId = "testUserId";
 
-        //[Fact]
-        //public void Add_Post_ShouldRedirectToDetails_WhenModelStateIsValid()
-        //{
-        //    // Arrange
-        //    var carServiceMock = new Mock<ICarService>();
-        //    var dealerServiceMock = new Mock<IDealerService>();
-        //    var carsController = new CarsController(carServiceMock.Object, dealerServiceMock.Object);
-        //    var carFormModel = new CarFormModel
-        //    {
-        //        // Set properties for the carFormModel as needed for the test scenario.
-        //    };
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, userId),
+            };
+            var identity = new ClaimsIdentity(claims, "TestAuthType");
+            var claimsPrincipal = new ClaimsPrincipal(identity);
+            carsController.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext { User = claimsPrincipal }
+            };
 
-        //    var userId = "user123"; // Set the user ID to be used in the test.
+            var carId = 1;
+            var dealerId = 1;
 
-        //    // Set up HttpContext with the User containing the required claims.
-        //    carsController.ControllerContext = new ControllerContext
-        //    {
-        //        HttpContext = new DefaultHttpContext
-        //        {
-        //            User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
-        //            {
-        //                new Claim(ClaimTypes.NameIdentifier, userId) // This sets the user ID claim.
-        //                // Add other claims as needed.
-        //            }, "mock"))
-        //        }
-        //    };
+            var carFormModel = new CarFormModel
+            {
+                Brand = "Toyota",
+                Model = "Camry",
+                Description = "A popular sedan model",
+                ImageUrl = "https://example.com/toyota.jpg",
+                Year = 2022,
+                CategoryId = 1
+            };
 
-        //    // Act
-        //    var result = carsController.Add(carFormModel);
+            carServiceMock
+                .Setup(c => c.CategoryExists(carFormModel.CategoryId))
+                .Returns(false);
 
-        //    // Assert
-        //    var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
-        //    Assert.Equal("Details", redirectToActionResult.ActionName);
-        //    // Add more assertions based on the expected behavior of the Add action.
-        //}
+            dealerServiceMock
+                .Setup(c => c.IdByUser(It.IsAny<string>()))
+                .Returns(dealerId);
 
-        //[Fact]
-        //public void Edit_Get_WithValidId_ShouldReturnViewWithCarFormModel()
-        //{
-        //    var mapper = MapperMock.Instance;
-        //    var data = DatabaseMock.Instance;
+            var result = carsController.Edit(carId, carFormModel);
 
-        //    var carService = new CarService(data, mapper);
-        //    var dealerService = new DealerService(data);
+            var viewResult = Assert.IsType<ViewResult>(result);
+            Assert.False(viewResult.ViewData.ModelState.IsValid);
+            Assert.True(viewResult.ViewData.ModelState.ContainsKey(nameof(carFormModel.CategoryId)));
 
-        //    var car = Cars.OneCarWithId1();
+            var modelStateEntry = viewResult.ViewData.ModelState[nameof(carFormModel.CategoryId)];
+            Assert.Equal("Category does not exist!", modelStateEntry!.Errors[0].ErrorMessage);
+        }
 
-        //    data.Cars.Add(car);
-        //    data.Users.Add(Users.OneUser());
-        //    data.Dealers.Add(Dealers.OneDealer());
-        //    data.SaveChanges();
+        [Fact]
+        public void Edit_WithInvalidModel_ShouldReturnViewWithModel()
+        {
+            var mapper = MapperMock.Instance;
+            var carServiceMock = new Mock<ICarService>();
+            var dealerServiceMock = new Mock<IDealerService>();
+            var carsController = new CarsController(carServiceMock.Object, dealerServiceMock.Object, mapper);
 
-        //    var carsController = new CarsController(carService, dealerService, mapper);
-        //    var httpContext = new DefaultHttpContext();
-        //    httpContext.User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
-        //    {
-        //        new Claim(ClaimTypes.NameIdentifier, "testUserId")
-        //    }));
+            var userId = "testUserId";
 
-        //    carsController.ControllerContext = new ControllerContext
-        //    {
-        //        HttpContext = httpContext
-        //    };
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, userId),
+            };
+            var identity = new ClaimsIdentity(claims, "TestAuthType");
+            var claimsPrincipal = new ClaimsPrincipal(identity);
+            carsController.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext { User = claimsPrincipal }
+            };
 
-        //    var result = carsController.Edit(car.Id);
+            var carId = 1;
+            var dealerId = 1;
 
-        //    var viewResult = Assert.IsType<ViewResult>(result);
-        //    var model = Assert.IsAssignableFrom<CarFormModel>(viewResult.ViewData.Model);
-        //    Assert.NotNull(model);
-        //    Assert.Equal("Toyota", model.Brand);
-        //    Assert.Equal("Camry", model.Model);
-        //}
+            var carFormModel = new CarFormModel
+            {
+                Brand = "Toyota",
+                Model = "Camry",
+                Description = "A popular sedan model",
+                ImageUrl = "https://example.com/toyota.jpg",
+                Year = 2022,
+                CategoryId = 1
+            };
+
+            carsController.ModelState.AddModelError("SomeKey", "Some error message");
+
+            carServiceMock
+                .Setup(c => c.CategoryExists(carFormModel.CategoryId))
+                .Returns(true);
+
+            dealerServiceMock
+                .Setup(c => c.IdByUser(It.IsAny<string>()))
+                .Returns(dealerId);
+
+            var result = carsController.Edit(carId, carFormModel);
+
+            var viewResult = Assert.IsType<ViewResult>(result);
+            var model = Assert.IsAssignableFrom<CarFormModel>(viewResult.ViewData.Model);
+            Assert.Equal(carFormModel, model);
+        }
+
+        [Fact]
+        public void Edit_WithInvalidCarId_ShouldReturnBadRequest()
+        {
+            var mapper = MapperMock.Instance;
+            var carServiceMock = new Mock<ICarService>();
+            var dealerServiceMock = new Mock<IDealerService>();
+            var carsController = new CarsController(carServiceMock.Object, dealerServiceMock.Object, mapper);
+
+            var carId = 1;
+            var dealerId = 1;
+            var userId = "testUserId";
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, userId),
+            };
+            var identity = new ClaimsIdentity(claims, "TestAuthType");
+            var claimsPrincipal = new ClaimsPrincipal(identity);
+            carsController.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext { User = claimsPrincipal }
+            };
+            carServiceMock
+                .Setup(c => c.CategoryExists(It.IsAny<int>()))
+                .Returns(true);
+
+            dealerServiceMock
+                .Setup(c => c.IdByUser(It.IsAny<string>()))
+                .Returns(dealerId);
+
+            var carFormModel = new CarFormModel
+            {
+                Brand = "Toyota",
+                Model = "Camry",
+                Description = "A popular sedan model",
+                ImageUrl = "https://example.com/toyota.jpg",
+                Year = 2022,
+                CategoryId = 1
+            };
+
+            var result = carsController.Edit(carId, carFormModel);
+
+            Assert.IsType<BadRequestResult>(result);
+        }
     }
 }

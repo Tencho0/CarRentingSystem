@@ -1,9 +1,10 @@
-﻿using CarRentingSystem.Services.Models.Cars;
-
-namespace CarRentingSystem.ViewModels.Cars
+﻿namespace CarRentingSystem.ViewModels.Cars
 {
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
+
+    using CarRentingSystem.Services.Models.Cars;
+
     using static Common.DataConstants.Car;
 
     public class CarFormModel : ICarModel

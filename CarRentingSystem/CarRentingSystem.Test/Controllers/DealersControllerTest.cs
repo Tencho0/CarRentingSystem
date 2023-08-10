@@ -12,7 +12,7 @@
     using Services.Dealers;
     using MyTested.AspNetCore.Mvc;
 
-    using Models.Dealers;
+    using ViewModels.Dealers;
     using CarRentingSystem.Controllers;
 
     public class DealersControllerTest
