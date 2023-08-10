@@ -1,14 +1,15 @@
 namespace CarRentingSystem
 {
-    using CarRentingSystem.Data;
-    using CarRentingSystem.Data.Models;
-    using CarRentingSystem.Infratructure.Extensions;
-    using CarRentingSystem.Services.Cars;
-    using CarRentingSystem.Services.Dealers;
-    using CarRentingSystem.Services.Statistics;
-    using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Identity;
     using Microsoft.EntityFrameworkCore;
+
+    using Data;
+    using Data.Models;
+    using Services.Cars;
+    using Services.Dealers;
+    using Services.Statistics;
+    using Infrastructure.Extensions;
 
     public class Program
     {

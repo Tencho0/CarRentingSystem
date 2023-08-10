@@ -8,11 +8,11 @@
     using Moq;
     using Xunit;
 
-    using Models;
-    using Models.Cars;
+    using ViewModels;
+    using ViewModels.Cars;
     using Services.Cars;
-    using Services.Cars.Models;
     using Services.Dealers;
+    using Services.Models.Cars;
 
     using CarsController = CarRentingSystem.Controllers.CarsController;
 

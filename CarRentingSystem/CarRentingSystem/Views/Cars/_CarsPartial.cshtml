@@ -1,6 +1,7 @@
 ﻿@using CarRentingSystem.Services.Cars
 @using Microsoft.AspNetCore.Mvc.TagHelpers
-@model IEnumerable<CarServiceModel>
+@using CarRentingSystem.Infrastructure.Extensions
+@model IEnumerable<CarRentingSystem.Services.Models.Cars.CarServiceModel>
 
 @inject IDealerService DealerService
 @inject ICarService CarService

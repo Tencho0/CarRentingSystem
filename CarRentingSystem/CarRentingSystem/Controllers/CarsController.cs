@@ -1,18 +1,18 @@
-﻿namespace CarRentingSystem.Controllers
+﻿using CarRentingSystem.Services.Models.Cars;
+
+namespace CarRentingSystem.Controllers
 {
     using AutoMapper;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
 
-    using Infratructure.Extensions;
-    using Models.Cars;
+    using Infrastructure.Extensions;
+    using ViewModels.Cars;
     using Services.Cars;
     using Services.Dealers;
 
-    using static WebConstants;
-    using static WebConstants.NotificationMessagesConstants;
-    using Microsoft.EntityFrameworkCore;
-    using CarRentingSystem.Services.Cars.Models;
+    using static Common.WebConstants;
+    using static Common.WebConstants.NotificationMessagesConstants;
 
     public class CarsController : Controller
     {
@@ -44,7 +44,7 @@
         [Authorize]
         public IActionResult Mine()
         {
-            var myCars = this.cars.ByUser(this.User.Id());
+            var myCars = this.cars.ByUser(this.User.Id()!);
 
             return View(myCars);
         }
@@ -64,7 +64,7 @@
         [Authorize]
         public IActionResult Add()
         {
-            if (!this.dealers.IsDealer(this.User.Id()))
+            if (!this.dealers.IsDealer(this.User.Id()!))
             {
                 return RedirectToAction(nameof(DealersController.Become), "Dealers");
             }

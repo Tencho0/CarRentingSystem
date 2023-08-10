@@ -5,14 +5,13 @@
 namespace CarRentingSystem.Areas.Identity.Pages.Account
 {
     using System.ComponentModel.DataAnnotations;
-    using System.Text;
-    using System.Text.Encodings.Web;
-    using CarRentingSystem.Data.Models;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.RazorPages;
-    using Microsoft.AspNetCore.WebUtilities;
-    using static Data.DataConstants.User;
+
+    using Data.Models;
+
+    using static Common.DataConstants.User;
 
     public class RegisterModel : PageModel
     {

@@ -1,12 +1,12 @@
-﻿namespace CarRentingSystem.Controllers
+﻿using CarRentingSystem.Services.Models.Cars;
+
+namespace CarRentingSystem.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Caching.Memory;
 
     using Services.Cars;
-    using CarRentingSystem.Services.Cars.Models;
-
-    using static WebConstants.Cache;
+    using static Common.WebConstants.Cache;
 
     public class HomeController : Controller
     {

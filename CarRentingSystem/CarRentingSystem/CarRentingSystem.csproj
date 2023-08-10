@@ -24,4 +24,10 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.13" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CarRentingSystem.Common\CarRentingSystem.Common.csproj" />
+    <ProjectReference Include="..\CarRentingSystem.Services\CarRentingSystem.Services.csproj" />
+    <ProjectReference Include="..\CarRentingSystem.ViewModels\CarRentingSystem.ViewModels.csproj" />
+  </ItemGroup>
+
 </Project>

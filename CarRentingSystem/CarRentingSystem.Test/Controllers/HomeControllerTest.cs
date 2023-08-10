@@ -1,4 +1,6 @@
-﻿namespace CarRentingSystem.Test.Controllers
+﻿using CarRentingSystem.Services.Models.Cars;
+
+namespace CarRentingSystem.Test.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Caching.Memory;
@@ -9,8 +11,6 @@
     using Services.Cars;
     using CarRentingSystem.Controllers;
     using CarRentingSystem.Data.Models;
-    using CarRentingSystem.Services.Cars.Models;
-
     using static Data.Cars;
 
     public class HomeControllerTest

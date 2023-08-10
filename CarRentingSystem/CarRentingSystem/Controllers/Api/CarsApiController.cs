@@ -1,9 +1,10 @@
 ﻿namespace CarRentingSystem.Controllers.Api
 {
-    using CarRentingSystem.Models.Api.Cars;
-    using CarRentingSystem.Services.Cars;
-    using CarRentingSystem.Services.Cars.Models;
     using Microsoft.AspNetCore.Mvc;
+
+    using Services.Cars;
+    using Services.Models.Cars;
+    using CarRentingSystem.ViewModels.Api.Cars;
 
     [ApiController]
     [Route("api/cars")]
@@ -15,7 +16,7 @@
             => this.cars = cars;
 
         [HttpGet]
-        public CarQueryServiceModel All([FromQuery] AllCarsApiRequestModel query) 
+        public CarQueryServiceModel All([FromQuery] AllCarsApiRequestModel query)
             => this.cars.All(query.Brand, query.SearchTerm, query.Sorting, query.CurrentPage, query.CarsPerPage);
     }
 }

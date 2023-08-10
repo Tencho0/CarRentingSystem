@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="12.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.15" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.13" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CarRentingSystem.Data.Models\CarRentingSystem.Data.Models.csproj" />
+    <ProjectReference Include="..\CarRentingSystem.Data\CarRentingSystem.Data.csproj" />
+    <ProjectReference Include="..\CarRentingSystem.ViewModels\CarRentingSystem.ViewModels.csproj" />
+  </ItemGroup>
+
+</Project>

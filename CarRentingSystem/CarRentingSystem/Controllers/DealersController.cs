@@ -1,15 +1,13 @@
-﻿using CarRentingSystem.Services.Dealers;
-
-namespace CarRentingSystem.Controllers
+﻿namespace CarRentingSystem.Controllers
 {
-    using CarRentingSystem.Data;
-    using CarRentingSystem.Data.Models;
-    using CarRentingSystem.Infratructure.Extensions;
-    using CarRentingSystem.Models.Dealers;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
 
-    using static WebConstants;
+    using Services.Dealers;
+    using ViewModels.Dealers;
+    using Infrastructure.Extensions;
+
+    using static Common.WebConstants;
 
     public class DealersController : Controller
     {
@@ -41,7 +39,7 @@ namespace CarRentingSystem.Controllers
             }
 
             this.dealers.CreateDealer(userId, dealer.Name, dealer.PhoneNumber);
-            
+
             TempData[GlobalMessageKey] = "Thank you for becoming a dealer!";
 
             return RedirectToAction("All", "Cars");

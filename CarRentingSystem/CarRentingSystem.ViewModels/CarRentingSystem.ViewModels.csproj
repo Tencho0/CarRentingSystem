@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CarRentingSystem.Common\CarRentingSystem.Common.csproj" />
+    <ProjectReference Include="..\CarRentingSystem.Services.Models\CarRentingSystem.Services.Models.csproj" />
+  </ItemGroup>
+
+</Project>

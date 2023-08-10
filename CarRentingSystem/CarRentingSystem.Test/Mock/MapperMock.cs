@@ -1,7 +1,8 @@
 ﻿namespace CarRentingSystem.Test.Mock
 {
     using AutoMapper;
-    using CarRentingSystem.Infratructure;
+
+    using Infrastructure;
 
     public static class MapperMock
     {
