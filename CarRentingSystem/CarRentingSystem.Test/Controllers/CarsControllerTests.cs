@@ -3,21 +3,24 @@
     using System.Security.Claims;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
     using Mock;
     using Moq;
     using Xunit;
 
+    using Common;
     using ViewModels;
     using ViewModels.Cars;
     using Services.Cars;
     using Services.Dealers;
     using Services.Models.Cars;
+    using Infrastructure.Extensions;
+    using CarRentingSystem.Controllers;
 
     using CarsController = CarRentingSystem.Controllers.CarsController;
-    using CarRentingSystem.Controllers;
-    using Microsoft.AspNetCore.Mvc.ViewFeatures;
-    using CarRentingSystem.Infrastructure.Extensions;
+    using static Common.WebConstants.NotificationMessagesConstants;
+    using AutoMapper;
 
     public class CarsControllerTests
     {
@@ -331,9 +334,10 @@
             var mapper = MapperMock.Instance;
             var carServiceMock = new Mock<ICarService>();
             var dealerServiceMock = new Mock<IDealerService>();
-            var tempDataMock = new Mock<ITempDataDictionary>();  // Create a mock for ITempDataDictionary
+
             var carsController = new CarsController(carServiceMock.Object, dealerServiceMock.Object, mapper);
-            carsController.TempData = tempDataMock.Object;
+            carsController.TempData = new TempDataDictionary(new DefaultHttpContext(), Mock.Of<ITempDataProvider>());
+
             var userId = "testUserId";
             var claims = new List<Claim>
             {
@@ -346,7 +350,6 @@
             {
                 HttpContext = new DefaultHttpContext { User = claimsPrincipal }
             };
-
 
             var carId = 1;
             var dealerId = 1;
@@ -396,6 +399,8 @@
 
             var redirectResult = Assert.IsType<RedirectToActionResult>(result);
             Assert.Equal("Details", redirectResult.ActionName);
+            Assert.Equal("Your car was edited successfully!",
+                carsController.TempData[WebConstants.GlobalMessageKey]);
 
             object expectedRouteValues = new
             {
@@ -403,7 +408,6 @@
                 information = carFormModel.GetInformation()
             };
 
-            // Convert actual RouteValueDictionary to an anonymous object for comparison
             var actualRouteValues = new
             {
                 id = (int)redirectResult.RouteValues["id"],
@@ -606,6 +610,173 @@
             var result = carsController.Edit(carId, carFormModel);
 
             Assert.IsType<BadRequestResult>(result);
+        }
+
+        [Fact]
+        public void Delete_WithValidCarId_ShouldReturnViewWithModel()
+        {
+            var carServiceMock = new Mock<ICarService>();
+            var dealerServiceMock = new Mock<IDealerService>();
+            var mapper = MapperMock.Instance;
+            var carsController = new CarsController(carServiceMock.Object, dealerServiceMock.Object, mapper);
+
+            var carId = 1;
+            var dealerId = 1;
+
+            carServiceMock
+                .Setup(c => c.ExistsById(carId))
+                .Returns(true);
+            dealerServiceMock
+                .Setup(d => d.IsDealer(It.IsAny<string>()))
+                .Returns(true);
+            dealerServiceMock
+                .Setup(d => d.IdByUser(It.IsAny<string>()))
+                .Returns(dealerId);
+            carServiceMock
+                .Setup(c => c.IsByDealer(carId, dealerId))
+                .Returns(true);
+            carServiceMock
+                .Setup(c => c.GetCarForDeleteById(carId))
+                .Returns(new CarDetailsServiceModel());
+
+            carsController.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext
+                {
+                    User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, "testUserId")
+                    }, "TestAuthType"))
+                }
+            };
+
+            var result = carsController.Delete(carId);
+
+            var viewResult = Assert.IsType<ViewResult>(result);
+            Assert.NotNull(viewResult.Model);
+        }
+
+        [Fact]
+        public void Delete_WithNonExistingCarId_ShouldRedirectToAllCars()
+        {
+            var carServiceMock = new Mock<ICarService>();
+            var dealerServiceMock = new Mock<IDealerService>();
+            var mapper = MapperMock.Instance;
+
+            var carsController = new CarsController(carServiceMock.Object, dealerServiceMock.Object, mapper);
+            carsController.TempData = new TempDataDictionary(new DefaultHttpContext(), Mock.Of<ITempDataProvider>());
+
+            carServiceMock.Setup(c => c.ExistsById(It.IsAny<int>())).Returns(false);
+
+            var result = carsController.Delete(1);
+
+            var redirectResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("All", redirectResult.ActionName);
+            Assert.Equal("Cars", redirectResult.ControllerName);
+            Assert.Equal("Car with the provided Id does not exist!",
+                carsController.TempData[ErrorMessage]);
+        }
+
+        [Fact]
+        public void Delete_WithoutDealerOrAdminRole_ShouldRedirectToBecomeDealer()
+        {
+            var carServiceMock = new Mock<ICarService>();
+            var dealerServiceMock = new Mock<IDealerService>();
+            var mapper = MapperMock.Instance;
+
+            var carsController = new CarsController(carServiceMock.Object, dealerServiceMock.Object, mapper);
+            carsController.TempData = new TempDataDictionary(new DefaultHttpContext(), Mock.Of<ITempDataProvider>());
+
+            carServiceMock.Setup(c => c.ExistsById(It.IsAny<int>())).Returns(true);
+            dealerServiceMock.Setup(d => d.IsDealer(It.IsAny<string>())).Returns(false);
+
+            carsController.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext
+                {
+                    User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, "testUserId")
+                    }, "TestAuthType"))
+                }
+            };
+
+            var result = carsController.Delete(1);
+
+            var redirectResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("Become", redirectResult.ActionName);
+            Assert.Equal("Dealers", redirectResult.ControllerName);
+            Assert.Equal("You must become a Dealer in order to edit or delete car info!",
+                carsController.TempData[ErrorMessage]);
+        }
+        
+        [Fact]
+        public void Delete_WithAdminRole_ShouldReturnViewWithCarForDelete()
+        {
+            var carServiceMock = new Mock<ICarService>();
+            var dealerServiceMock = new Mock<IDealerService>();
+            var mapper = MapperMock.Instance;
+
+            var carsController = new CarsController(carServiceMock.Object, dealerServiceMock.Object, mapper);
+            carsController.TempData = new TempDataDictionary(new DefaultHttpContext(), Mock.Of<ITempDataProvider>());
+            carServiceMock.Setup(c => c.ExistsById(It.IsAny<int>())).Returns(true);
+            carServiceMock.Setup(c => c.GetCarForDeleteById(It.IsAny<int>())).Returns(new CarDetailsServiceModel());
+
+            carsController.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext
+                {
+                    User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, "testUserId"),
+                        new Claim(ClaimTypes.Role, "Administrator")
+                    }, "TestAuthType"))
+                }
+            };
+            
+            var result = carsController.Delete(1);
+
+            var viewResult = Assert.IsType<ViewResult>(result);
+            Assert.IsType<CarDetailsServiceModel>(viewResult.Model);
+        }
+
+        [Fact]
+        public void Delete_WithException_ShouldReturnGeneralErrorView()
+        {
+            var carServiceMock = new Mock<ICarService>();
+            var dealerServiceMock = new Mock<IDealerService>();
+            var mapper = MapperMock.Instance;
+
+            var carsController = new CarsController(carServiceMock.Object, dealerServiceMock.Object, mapper);
+            carsController.TempData = new TempDataDictionary(new DefaultHttpContext(), Mock.Of<ITempDataProvider>());
+            carServiceMock
+                .Setup(c => c.ExistsById(It.IsAny<int>()))
+                .Returns(true);
+            carServiceMock
+                .Setup(c => c.IsByDealer(It.IsAny<int>(), It.IsAny<int>()))
+                .Returns(true);
+            dealerServiceMock
+                .Setup(d => d.IsDealer(It.IsAny<string>()))
+                .Returns(true);
+            carServiceMock
+                .Setup(c => c.GetCarForDeleteById(It.IsAny<int>()))
+                .Throws(new Exception("Test Exception"));
+            carsController.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext
+                {
+                    User = new ClaimsPrincipal(new ClaimsIdentity(new Claim[]
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, "testUserId")
+                    }, "TestAuthType"))
+                }
+            };
+
+            var result = carsController.Delete(1);
+            
+            var redirectResult = Assert.IsType<RedirectToActionResult>(result);
+            Assert.Equal("Index", redirectResult.ActionName);
+            Assert.Equal("Home", redirectResult.ControllerName);
         }
     }
 }
