@@ -1,6 +1,4 @@
-﻿using CarRentingSystem.Services.Models.Cars;
-
-namespace CarRentingSystem.Controllers
+﻿namespace CarRentingSystem.Controllers
 {
     using AutoMapper;
     using Microsoft.AspNetCore.Authorization;
@@ -10,6 +8,7 @@ namespace CarRentingSystem.Controllers
     using ViewModels.Cars;
     using Services.Cars;
     using Services.Dealers;
+    using Services.Models.Cars;
 
     using static Common.WebConstants;
     using static Common.WebConstants.NotificationMessagesConstants;
@@ -315,7 +314,7 @@ namespace CarRentingSystem.Controllers
                 return GeneralError();
             }
 
-            return RedirectToAction("Mine", "Cars");
+            return RedirectToAction("All", "Cars");
         }
 
         [HttpPost]
@@ -355,7 +354,7 @@ namespace CarRentingSystem.Controllers
                 return GeneralError();
             }
 
-            return RedirectToAction("Mine", "Cars");
+            return RedirectToAction("All", "Cars");
         }
 
         private IActionResult GeneralError()

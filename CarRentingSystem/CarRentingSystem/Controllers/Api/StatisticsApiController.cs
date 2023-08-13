@@ -1,6 +1,6 @@
 ﻿namespace CarRentingSystem.Controllers.Api
 {
-    using CarRentingSystem.Services.Statistics;
+    using Services.Statistics;
     using Microsoft.AspNetCore.Mvc;
 
     [ApiController]
