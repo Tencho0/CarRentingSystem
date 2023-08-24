@@ -5,7 +5,7 @@
 
     public interface ICarService
     {
-        CarQueryServiceModel All(
+        Task<CarQueryServiceModel> AllAsync(
             string brand = null,
             string searchTerm = null,
             CarSorting sorting = CarSorting.DateCreated,
@@ -13,11 +13,11 @@
             int carsPerPage = int.MaxValue,
             bool publicOnly = true);
 
-        IEnumerable<LatestCarServiceModel> Latest();
+        Task<IEnumerable<LatestCarServiceModel>> LatestAsync();
 
-        CarDetailsServiceModel? Details(int carId);
+        Task<CarDetailsServiceModel?> DetailsAsync(int carId);
 
-        int Create(
+        Task<int> CreateAsync(
             string brand,
             string model,
             string description,
@@ -26,7 +26,7 @@
             int categoryId,
             int dealerId);
 
-        bool Edit(
+        Task<bool> EditAsync(
             int carId,
             string brand,
             string model,
@@ -36,30 +36,30 @@
             int categoryId,
             bool isPublic);
 
-        CarDetailsServiceModel GetCarForDeleteById(int id);
+        Task<CarDetailsServiceModel> GetCarForDeleteByIdAsync(int id);
 
-        void DeleteCarById(int id);
+        Task DeleteCarByIdAsync(int id);
 
-        IEnumerable<CarServiceModel> ByUser(string userId);
+        Task<IEnumerable<CarServiceModel>> ByUserAsync(string userId);
 
-        bool IsRented(int carId);
+        Task<bool> IsRentedAsync(int carId);
 
-        bool IsByDealer(int carId, int dealerId);
+        Task<bool> IsByDealerAsync(int carId, int dealerId);
 
-        bool IsRentedByUserWithId(int carId, string renterId);
+        Task<bool> IsRentedByUserWithIdAsync(int carId, string renterId);
 
-        void ChangeVisibility(int carId);
+        Task ChangeVisibilityAsync(int carId);
 
-        IEnumerable<string> AllBrands();
+        Task<IEnumerable<string>> AllBrandsAsync();
 
-        IEnumerable<CarCategoryServiceModel> AllCategories();
+        Task<IEnumerable<CarCategoryServiceModel>> AllCategoriesAsync();
 
-        bool CategoryExists(int categoryId);
+        Task<bool> CategoryExistsAsync(int categoryId);
 
-        bool ExistsById(int carId);
+        Task<bool> ExistsByIdAsync(int carId);
 
-        void RentCar(int carId, string userId);
+        Task RentCarAsync(int carId, string userId);
 
-        void ReturnCar(int carId);
+        Task ReturnCarAsync(int carId);
     }
 }

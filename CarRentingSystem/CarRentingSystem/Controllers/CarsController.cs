@@ -26,12 +26,12 @@
             this.mapper = mapper;
         }
 
-        public IActionResult All([FromQuery] AllCarsQueryModel query)
+        public async Task<IActionResult> All([FromQuery] AllCarsQueryModel query)
         {
-            var queryResult = this.cars
-                .All(query.Brand, query.SearchTerm, query.Sorting, query.CurrentPage, AllCarsQueryModel.CarsPerPage);
+            var queryResult = await this.cars
+                .AllAsync(query.Brand, query.SearchTerm, query.Sorting, query.CurrentPage, AllCarsQueryModel.CarsPerPage);
 
-            var carBrands = this.cars.AllBrands();
+            var carBrands = await this.cars.AllBrandsAsync();
 
             query.Brands = carBrands;
             query.TotalCars = queryResult.TotalCars;
@@ -41,16 +41,16 @@
         }
 
         [Authorize]
-        public IActionResult Mine()
+        public async Task<IActionResult> Mine()
         {
-            var myCars = this.cars.ByUser(this.User.Id()!);
+            var myCars = await this.cars.ByUserAsync(this.User.Id()!);
 
             return View(myCars);
         }
 
-        public IActionResult Details(int id, string information)
+        public async Task<IActionResult> Details(int id, string information)
         {
-            var car = this.cars.Details(id);
+            var car = await this.cars.DetailsAsync(id);
 
             if (car == null || information != car.GetInformation())
             {
@@ -61,42 +61,42 @@
         }
 
         [Authorize]
-        public IActionResult Add()
+        public async Task<IActionResult> Add()
         {
-            if (!this.dealers.IsDealer(this.User.Id()!))
+            if (!await this.dealers.IsDealerAsync(this.User.Id()!))
             {
                 return RedirectToAction(nameof(DealersController.Become), "Dealers");
             }
 
             return View(new CarFormModel
             {
-                Categories = this.cars.AllCategories()
+                Categories = await this.cars.AllCategoriesAsync()
             });
         }
 
         [HttpPost]
         [Authorize]
-        public IActionResult Add(CarFormModel car)
+        public async Task<IActionResult> Add(CarFormModel car)
         {
-            var dealerId = this.dealers.IdByUser(this.User.Id()!);
+            var dealerId = await this.dealers.IdByUserAsync(this.User.Id()!);
 
             if (dealerId == 0)
             {
                 return RedirectToAction(nameof(DealersController.Become), "Dealers");
             }
 
-            if (!this.cars.CategoryExists(car.CategoryId))
+            if (!await this.cars.CategoryExistsAsync(car.CategoryId))
             {
                 this.ModelState.AddModelError(nameof(car.CategoryId), "Category does not exist!");
             }
 
             if (!ModelState.IsValid)
             {
-                car.Categories = this.cars.AllCategories();
+                car.Categories = await this.cars.AllCategoriesAsync();
                 return View(car);
             }
 
-            var carId = this.cars.Create(
+            var carId = await this.cars.CreateAsync(
                 car.Brand,
                 car.Model,
                 car.Description,
@@ -115,16 +115,16 @@
         }
 
         [Authorize]
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
             var userId = this.User.Id()!;
 
-            if (!this.dealers.IsDealer(userId) && !this.User.IsAdmin())
+            if (!await this.dealers.IsDealerAsync(userId) && !this.User.IsAdmin())
             {
                 return RedirectToAction(nameof(DealersController.Become), "Dealers");
             }
 
-            var car = this.cars.Details(id);
+            var car = await this.cars.DetailsAsync(id);
 
             if (car == null)
             {
@@ -137,47 +137,47 @@
             }
 
             var carForm = this.mapper.Map<CarFormModel>(car);
-            carForm.Categories = this.cars.AllCategories();
+            carForm.Categories = await this.cars.AllCategoriesAsync();
 
             return View(carForm);
         }
 
         [HttpPost]
         [Authorize]
-        public IActionResult Edit(int id, CarFormModel car)
+        public async Task<IActionResult> Edit(int id, CarFormModel car)
         {
-            var dealerId = this.dealers.IdByUser(this.User.Id()!);
+            var dealerId = await this.dealers.IdByUserAsync(this.User.Id()!);
 
             if (dealerId == 0 && !User.IsAdmin())
             {
                 return RedirectToAction(nameof(DealersController.Become), "Dealers");
             }
 
-            if (!this.cars.CategoryExists(car.CategoryId))
+            if (!await this.cars.CategoryExistsAsync(car.CategoryId))
             {
                 this.ModelState.AddModelError(nameof(car.CategoryId), "Category does not exist!");
             }
 
             if (!ModelState.IsValid)
             {
-                car.Categories = this.cars.AllCategories();
+                car.Categories = await this.cars.AllCategoriesAsync();
                 return View(car);
             }
 
-            if (!this.cars.IsByDealer(id, dealerId) && !User.IsAdmin())
+            if (!await this.cars.IsByDealerAsync(id, dealerId) && !User.IsAdmin())
             {
                 return BadRequest();
             }
 
-            var edited = this.cars.Edit(
-                 id,
-                 car.Brand,
-                 car.Model,
-                 car.Description,
-                 car.ImageUrl,
-                 car.Year,
-                 car.CategoryId,
-                 this.User.IsAdmin());
+            var edited = await this.cars.EditAsync(
+                id,
+                car.Brand,
+                car.Model,
+                car.Description,
+                car.ImageUrl,
+                car.Year,
+                car.CategoryId,
+                this.User.IsAdmin());
 
             if (!edited)
             {
@@ -192,11 +192,11 @@
                 information = car.GetInformation()
             });
         }
-
+        
         [HttpGet]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            bool carExists = this.cars.ExistsById(id);
+            bool carExists = await this.cars.ExistsByIdAsync(id);
             if (!carExists)
             {
                 TempData[ErrorMessage] = "Car with the provided Id does not exist!";
@@ -204,7 +204,7 @@
                 return RedirectToAction("All", "Cars");
             }
 
-            bool isUserDealer = this.dealers.IsDealer(User.Id()!);
+            bool isUserDealer = await this.dealers.IsDealerAsync(User.Id()!);
             if (!isUserDealer && !User.IsAdmin())
             {
                 TempData[ErrorMessage] = "You must become a Dealer in order to edit or delete car info!";
@@ -212,8 +212,8 @@
                 return RedirectToAction("Become", "Dealers");
             }
 
-            int dealerId = this.dealers.IdByUser(User.Id()!);
-            bool isDealerOwner = this.cars.IsByDealer(id, dealerId);
+            int dealerId = await this.dealers.IdByUserAsync(User.Id()!);
+            bool isDealerOwner = await this.cars.IsByDealerAsync(id, dealerId);
             if (!isDealerOwner && !User.IsAdmin())
             {
                 TempData[ErrorMessage] =
@@ -224,7 +224,7 @@
 
             try
             {
-                CarDetailsServiceModel viewModel = this.cars.GetCarForDeleteById(id);
+                CarDetailsServiceModel viewModel = await this.cars.GetCarForDeleteByIdAsync(id);
 
                 return View(viewModel);
             }
@@ -236,9 +236,9 @@
 
         [HttpPost]
         [Authorize]
-        public IActionResult Delete(int id, CarDetailsServiceModel model)
+        public async Task<IActionResult> Delete(int id, CarDetailsServiceModel model)
         {
-            bool carExists = this.cars.ExistsById(id);
+            bool carExists = await this.cars.ExistsByIdAsync(id);
             if (!carExists)
             {
                 TempData[ErrorMessage] = "Car with the provided Id does not exist!";
@@ -246,7 +246,7 @@
                 return RedirectToAction("All", "Cars");
             }
 
-            bool isUserDealer = this.dealers.IsDealer(User.Id()!);
+            bool isUserDealer = await this.dealers.IsDealerAsync(User.Id()!);
             if (!isUserDealer && !User.IsAdmin())
             {
                 TempData[ErrorMessage] = "You must become a Dealer in order to edit or delete car info!";
@@ -254,8 +254,8 @@
                 return RedirectToAction("Become", "Dealers");
             }
 
-            int dealerId = this.dealers.IdByUser(User.Id()!);
-            bool isDealerOwner = this.cars.IsByDealer(id, dealerId);
+            int dealerId = await this.dealers.IdByUserAsync(User.Id()!);
+            bool isDealerOwner = await this.cars.IsByDealerAsync(id, dealerId);
             if (!isDealerOwner && !User.IsAdmin())
             {
                 TempData[ErrorMessage] =
@@ -266,7 +266,7 @@
 
             try
             {
-                this.cars.DeleteCarById(id);
+                await this.cars.DeleteCarByIdAsync(id);
 
                 TempData[WarningMessage] = "The car was successfully deleted!";
                 return RedirectToAction("Mine", "Cars");
@@ -278,9 +278,9 @@
         }
 
         [HttpPost]
-        public IActionResult Rent(int id)
+        public async Task<IActionResult> Rent(int id)
         {
-            bool carExists = this.cars.ExistsById(id);
+            bool carExists = await this.cars.ExistsByIdAsync(id);
             if (!carExists)
             {
                 TempData[ErrorMessage] = "Car with provided Id does not exist! Please try again!";
@@ -288,7 +288,7 @@
                 return RedirectToAction("All", "Cars");
             }
 
-            bool isCarRented = this.cars.IsRented(id);
+            bool isCarRented = await this.cars.IsRentedAsync(id);
             if (isCarRented)
             {
                 TempData[ErrorMessage] =
@@ -297,7 +297,7 @@
                 return RedirectToAction("All", "Cars");
             }
 
-            bool isUserDealer = this.dealers.IsDealer(this.User.Id()!);
+            bool isUserDealer = await this.dealers.IsDealerAsync(this.User.Id()!);
             if (isUserDealer && !User.IsAdmin())
             {
                 TempData[ErrorMessage] = "Agents can't rent Cars. Please register as a user!";
@@ -307,7 +307,7 @@
 
             try
             {
-                cars.RentCar(id, this.User.Id()!);
+                await cars.RentCarAsync(id, this.User.Id()!);
             }
             catch (Exception)
             {
@@ -318,9 +318,9 @@
         }
 
         [HttpPost]
-        public IActionResult ReturnCar(int id)
+        public async Task<IActionResult> ReturnCar(int id)
         {
-            bool carExists = cars.ExistsById(id);
+            bool carExists = await cars.ExistsByIdAsync(id);
             if (!carExists)
             {
                 TempData[ErrorMessage] = "Car with provided id does not exist! Please try again!";
@@ -328,7 +328,7 @@
                 return RedirectToAction("All", "Cars");
             }
 
-            bool isCarRented = cars.IsRented(id);
+            bool isCarRented = await cars.IsRentedAsync(id);
             if (!isCarRented)
             {
                 TempData[ErrorMessage] = "Selected car is not rented!";
@@ -336,7 +336,7 @@
                 return RedirectToAction("Mine", "Cars");
             }
 
-            bool isCurrentUserRenterOfTheCar = cars.IsRentedByUserWithId(id, User.Id()!);
+            bool isCurrentUserRenterOfTheCar = await cars.IsRentedByUserWithIdAsync(id, User.Id()!);
             if (!isCurrentUserRenterOfTheCar)
             {
                 TempData[ErrorMessage] =
@@ -347,7 +347,7 @@
 
             try
             {
-                cars.ReturnCar(id);
+                await cars.ReturnCarAsync(id);
             }
             catch (Exception)
             {

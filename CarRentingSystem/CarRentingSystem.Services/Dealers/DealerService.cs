@@ -1,5 +1,7 @@
 ﻿namespace CarRentingSystem.Services.Dealers
 {
+    using Microsoft.EntityFrameworkCore;
+
     using Data;
     using CarRentingSystem.Data.Models;
 
@@ -7,19 +9,19 @@
     {
         private readonly CarRentingDbContext data;
 
-        public DealerService(CarRentingDbContext data) 
+        public DealerService(CarRentingDbContext data)
             => this.data = data;
 
-        public int IdByUser(string userId)
-            => this.data.Dealers
+        public async Task<int> IdByUserAsync(string userId)
+            => await this.data.Dealers
                 .Where(d => d.UserId == userId)
                 .Select(d => d.Id)
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
 
-        public bool IsDealer(string userId)
-         => this.data.Dealers.Any(d => d.UserId == userId);
+        public async Task<bool> IsDealerAsync(string userId)
+         => await this.data.Dealers.AnyAsync(d => d.UserId == userId);
 
-        public void CreateDealer(string userId, string name, string phoneNumber)
+        public async Task CreateDealerAsync(string userId, string name, string phoneNumber)
         {
             var dealerData = new Dealer
             {
@@ -28,8 +30,8 @@
                 UserId = userId,
             };
 
-            this.data.Add(dealerData);
-            this.data.SaveChanges();
+            await this.data.AddAsync(dealerData);
+            await this.data.SaveChangesAsync();
         }
     }
 }

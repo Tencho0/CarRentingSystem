@@ -16,7 +16,7 @@
             => this.cars = cars;
 
         [HttpGet]
-        public CarQueryServiceModel All([FromQuery] AllCarsApiRequestModel query)
-            => this.cars.All(query.Brand, query.SearchTerm, query.Sorting, query.CurrentPage, query.CarsPerPage);
+        public async Task<CarQueryServiceModel> All([FromQuery] AllCarsApiRequestModel query)
+            => await this.cars.AllAsync(query.Brand, query.SearchTerm, query.Sorting, query.CurrentPage, query.CarsPerPage);
     }
 }

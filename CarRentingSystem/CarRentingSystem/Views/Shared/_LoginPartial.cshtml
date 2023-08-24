@@ -10,7 +10,7 @@
     @if (SignInManager.IsSignedIn(User))
     {
         var userId = User.Id()!;
-        var userIsDealer = Dealers.IsDealer(userId);
+        var userIsDealer = await Dealers.IsDealerAsync(userId);
         var userIsAdmin = User.IsAdmin();
 
         @if (userIsDealer && !userIsAdmin)

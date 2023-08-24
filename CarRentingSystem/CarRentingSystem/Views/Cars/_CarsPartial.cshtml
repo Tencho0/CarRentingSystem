@@ -39,8 +39,8 @@
                     }
                     @if (User.Id() != null)
                     {
-                        bool isUserDealer = DealerService.IsDealer(User.Id()!);
-                        bool isCarRentedByUserWithId = CarService.IsRentedByUserWithId(car.Id, User.Id()!);
+                        bool isUserDealer = await DealerService.IsDealerAsync(User.Id()!);
+                        bool isCarRentedByUserWithId = await CarService.IsRentedByUserWithIdAsync(car.Id, User.Id()!);
 
                         @if (car.RenterId == null)
                         {

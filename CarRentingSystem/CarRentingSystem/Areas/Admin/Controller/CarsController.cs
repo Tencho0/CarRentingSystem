@@ -1,7 +1,8 @@
 ﻿namespace CarRentingSystem.Areas.Admin.Controller
 {
     using Microsoft.AspNetCore.Mvc;
-    using CarRentingSystem.Services.Cars;
+
+    using Services.Cars;
 
     public class CarsController : AdminController
     {
@@ -9,11 +10,15 @@
 
         public CarsController(ICarService cars) => this.cars = cars;
 
-        public IActionResult All() => View(this.cars.All(publicOnly: false).Cars);
-
-        public IActionResult ChangeVisibility(int id)
+        public async Task<IActionResult> All()
         {
-            this.cars.ChangeVisibility(id);
+            var carQueryResult = await this.cars.AllAsync(publicOnly: false);
+            return View(carQueryResult.Cars);
+        }
+
+        public async Task<IActionResult> ChangeVisibility(int id)
+        {
+            await this.cars.ChangeVisibilityAsync(id);
 
             return RedirectToAction(nameof(All));
         }

@@ -1,11 +1,11 @@
-﻿using CarRentingSystem.Services.Models.Cars;
-
-namespace CarRentingSystem.Controllers
+﻿namespace CarRentingSystem.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Caching.Memory;
 
     using Services.Cars;
+    using Services.Models.Cars;
+
     using static Common.WebConstants.Cache;
 
     public class HomeController : Controller
@@ -19,21 +19,20 @@ namespace CarRentingSystem.Controllers
             this.cache = cache;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var latestCars = this.cache.Get<List<LatestCarServiceModel>>(LatestCarsCacheKey);
-            if (latestCars == null)
+            var latestCars = await this.cache.GetOrCreateAsync(LatestCarsCacheKey, async entry =>
             {
-                latestCars = this.cars.Latest().ToList();
+                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10);
 
-                var cacheOptions = new MemoryCacheEntryOptions()
-                    .SetAbsoluteExpiration(TimeSpan.FromMinutes(10));
+                var latestCarsData = await this.cars.LatestAsync();
 
-                this.cache.Set(LatestCarsCacheKey, latestCars, cacheOptions);
-            }
+                return latestCarsData.ToList();
+            });
 
             return View(latestCars);
         }
+
         public IActionResult Error() => View();
     }
 }

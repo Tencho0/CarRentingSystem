@@ -2,10 +2,10 @@
 {
     public interface IDealerService
     {
-        public bool IsDealer(string userId);
+        public Task<bool> IsDealerAsync(string userId);
 
-        public int IdByUser(string userId);
+        public Task<int> IdByUserAsync(string userId);
 
-        public void CreateDealer(string userId, string name, string phoneNumber);
+        public Task CreateDealerAsync(string userId, string name, string phoneNumber);
     }
 }

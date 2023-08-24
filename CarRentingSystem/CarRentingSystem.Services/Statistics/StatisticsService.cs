@@ -1,6 +1,7 @@
 ﻿namespace CarRentingSystem.Services.Statistics
 {
-    using CarRentingSystem.Data;
+    using Data;
+    using Microsoft.EntityFrameworkCore;
 
     public class StatisticsService : IStatisticsService
     {
@@ -9,10 +10,10 @@
         public StatisticsService(CarRentingDbContext data)
             => this.data = data;
 
-        public StatisticsServiceModel Total()
+        public async Task<StatisticsServiceModel> TotalAsync()
         {
-            var totalCars = this.data.Cars.Count(c=> c.IsPublic);
-            var totalUsers = this.data.Users.Count();
+            var totalCars = await this.data.Cars.CountAsync(c => c.IsPublic);
+            var totalUsers = await this.data.Users.CountAsync();
 
             return new StatisticsServiceModel
             {

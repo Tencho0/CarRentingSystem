@@ -23,10 +23,10 @@
 
         [HttpPost]
         [Authorize]
-        public IActionResult Become(BecomeDealerFromModel dealer)
+        public async Task<IActionResult> Become(BecomeDealerFromModel dealer)
         {
             var userId = this.User.Id()!;
-            var userIdAlreadyDealer = this.dealers.IsDealer(userId);
+            var userIdAlreadyDealer = await this.dealers.IsDealerAsync(userId);
 
             if (userIdAlreadyDealer)
             {
@@ -38,7 +38,7 @@
                 return View(dealer);
             }
 
-            this.dealers.CreateDealer(userId, dealer.Name, dealer.PhoneNumber);
+            await this.dealers.CreateDealerAsync(userId, dealer.Name, dealer.PhoneNumber);
 
             TempData[GlobalMessageKey] = "Thank you for becoming a dealer!";
 
