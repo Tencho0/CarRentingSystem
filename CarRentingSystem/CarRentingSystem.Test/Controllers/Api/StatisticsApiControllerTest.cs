@@ -7,11 +7,11 @@ namespace CarRentingSystem.Test.Controllers.Api
     public class StatisticsApiControllerTest
     {
         [Fact]
-        public void GetStatisticsShouldReturnTotalStatistics()
+        public async void GetStatisticsShouldReturnTotalStatistics()
         {
             var controller = new StatisticsApiController(StatisticsServiceMock.Instance);
 
-            var result = controller.GetStatistics();
+            var result = await controller.GetStatistics();
 
             Assert.NotNull(result);
             Assert.Equal(5, result.TotalCars);

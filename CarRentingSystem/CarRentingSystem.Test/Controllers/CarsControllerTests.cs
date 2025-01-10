@@ -43,8 +43,8 @@
             };
 
             carServiceMock
-                .Setup(s => s.All(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CarSorting>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<bool>()))
-                .Returns(queryResult);
+                .Setup(s => s.AllAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CarSorting>(), It.IsAny<int>(), It.IsAny<int>(), It.IsAny<bool>()))
+                .ReturnsAsync(queryResult);
 
             // Act
             var result = carsController.All(queryModel);
@@ -65,8 +65,8 @@
             var carsController = new CarsController(carServiceMock.Object, dealerServiceMock.Object, mapper);
             var carId = 1;
 
-            carServiceMock.Setup(c => c.Details(carId))
-                .Returns(new CarDetailsServiceModel
+            carServiceMock.Setup(c => c.DetailsAsync(carId))
+                .ReturnsAsync(new CarDetailsServiceModel
                 {
                     Id = carId,
                     Brand = "Toyota",
@@ -109,8 +109,8 @@
             var carId = 1;
             var information = "Invalid-Information";
 
-            carServiceMock.Setup(c => c.Details(carId))
-                .Returns(new CarDetailsServiceModel
+            carServiceMock.Setup(c => c.DetailsAsync(carId))
+                .ReturnsAsync(new CarDetailsServiceModel
                 {
                     Id = carId,
                     Brand = "Toyota",
@@ -142,7 +142,7 @@
                 HttpContext = new DefaultHttpContext { User = claimsPrincipal }
             };
 
-            dealerServiceMock.Setup(d => d.IsDealer("testUserId")).Returns(true);
+            dealerServiceMock.Setup(d => d.IsDealerAsync("testUserId")).ReturnsAsync(true);
 
             var result = carsController.Add();
 
@@ -170,7 +170,7 @@
                 HttpContext = new DefaultHttpContext { User = claimsPrincipal }
             };
 
-            dealerServiceMock.Setup(d => d.IsDealer(It.IsAny<string>())).Returns(false);
+            dealerServiceMock.Setup(d => d.IsDealerAsync(It.IsAny<string>())).ReturnsAsync(false);
 
             var result = carsController.Add();
 
@@ -199,8 +199,8 @@
             };
             var carId = 1;
 
-            carServiceMock.Setup(c => c.Details(carId))
-                .Returns(new CarDetailsServiceModel
+            carServiceMock.Setup(c => c.DetailsAsync(carId))
+                .ReturnsAsync(new CarDetailsServiceModel
                 {
                     Id = carId,
                     Brand = "Toyota",
@@ -209,7 +209,7 @@
                     UserId = userId,
 
                 });
-            dealerServiceMock.Setup(d => d.IsDealer(It.IsAny<string>())).Returns(true);
+            dealerServiceMock.Setup(d => d.IsDealerAsync(It.IsAny<string>())).ReturnsAsync(true);
 
             var result = carsController.Edit(carId);
 
@@ -223,7 +223,7 @@
         }
 
         [Fact]
-        public void Edit_Get_WithInvalidUserId_ShouldReturnViewWithCarFormModel()
+        public async void Edit_Get_WithInvalidUserId_ShouldReturnViewWithCarFormModel()
         {
             var mapper = MapperMock.Instance;
             var carServiceMock = new Mock<ICarService>();
@@ -242,8 +242,8 @@
             };
             var carId = 1;
 
-            carServiceMock.Setup(c => c.Details(carId))
-                .Returns(new CarDetailsServiceModel
+            carServiceMock.Setup(c => c.DetailsAsync(carId))
+                .ReturnsAsync(new CarDetailsServiceModel
                 {
                     Id = carId,
                     Brand = "Toyota",
@@ -252,9 +252,9 @@
                     UserId = userId,
 
                 });
-            dealerServiceMock.Setup(d => d.IsDealer(It.IsAny<string>())).Returns(false);
+            dealerServiceMock.Setup(d => d.IsDealerAsync(It.IsAny<string>())).ReturnsAsync(false);
 
-            var result = carsController.Edit(carId) as RedirectToActionResult;
+            var result = await carsController.Edit(carId) as RedirectToActionResult;
 
             Assert.NotNull(result);
             Assert.Equal(nameof(DealersController.Become), result.ActionName);
@@ -278,7 +278,7 @@
             {
                 HttpContext = new DefaultHttpContext { User = claimsPrincipal }
             };
-            dealerServiceMock.Setup(d => d.IsDealer(It.IsAny<string>())).Returns(true);
+            dealerServiceMock.Setup(d => d.IsDealerAsync(It.IsAny<string>())).ReturnsAsync(true);
 
             var carId = 1;
 
@@ -311,8 +311,8 @@
 
             var carId = 1;
 
-            carServiceMock.Setup(c => c.Details(carId))
-                .Returns(new CarDetailsServiceModel
+            carServiceMock.Setup(c => c.DetailsAsync(carId))
+                .ReturnsAsync(new CarDetailsServiceModel
                 {
                     Id = carId,
                     Brand = "Toyota",
@@ -321,7 +321,7 @@
                     UserId = invalidUserId,
 
                 });
-            dealerServiceMock.Setup(d => d.IsDealer(It.IsAny<string>())).Returns(true);
+            dealerServiceMock.Setup(d => d.IsDealerAsync(It.IsAny<string>())).ReturnsAsync(true);
 
             var result = carsController.Edit(carId);
 
@@ -365,16 +365,16 @@
             };
 
             dealerServiceMock
-                .Setup(c => c.IdByUser(It.IsAny<string>()))
-                .Returns(dealerId);
+                .Setup(c => c.IdByUserAsync(It.IsAny<string>()))
+                .ReturnsAsync(dealerId);
             carServiceMock
-                .Setup(c => c.CategoryExists(It.IsAny<int>()))
-                .Returns(true);
+                .Setup(c => c.CategoryExistsAsync(It.IsAny<int>()))
+                .ReturnsAsync(true);
             carServiceMock
-                .Setup(c => c.IsByDealer(It.IsAny<int>(), It.IsAny<int>()))
-                .Returns(true);
+                .Setup(c => c.IsByDealerAsync(It.IsAny<int>(), It.IsAny<int>()))
+                .ReturnsAsync(true);
             carServiceMock
-                .Setup(c => c.Edit(carId,
+                .Setup(c => c.EditAsync(carId,
                         carFormModel.Brand,
                         carFormModel.Model,
                         carFormModel.Description,
@@ -382,11 +382,11 @@
                         carFormModel.Year,
                         carFormModel.CategoryId,
                         It.IsAny<bool>()))
-                .Returns(true);
+                .ReturnsAsync(true);
 
             var result = carsController.Edit(carId, carFormModel);
 
-            carServiceMock.Verify(c => c.Edit(
+            carServiceMock.Verify(c => c.EditAsync(
                 carId,
                 carFormModel.Brand,
                 carFormModel.Model,
@@ -452,8 +452,8 @@
             };
 
             dealerServiceMock
-                .Setup(c => c.IdByUser(It.IsAny<string>()))
-                .Returns(invalidDealerId);
+                .Setup(c => c.IdByUserAsync(It.IsAny<string>()))
+                .ReturnsAsync(invalidDealerId);
 
             var result = carsController.Edit(carId, carFormModel);
 
@@ -499,12 +499,12 @@
             };
 
             carServiceMock
-                .Setup(c => c.CategoryExists(carFormModel.CategoryId))
-                .Returns(false);
+                .Setup(c => c.CategoryExistsAsync(carFormModel.CategoryId))
+                .ReturnsAsync(false);
 
             dealerServiceMock
-                .Setup(c => c.IdByUser(It.IsAny<string>()))
-                .Returns(dealerId);
+                .Setup(c => c.IdByUserAsync(It.IsAny<string>()))
+                .ReturnsAsync(dealerId);
 
             var result = carsController.Edit(carId, carFormModel);
 
@@ -553,12 +553,12 @@
             carsController.ModelState.AddModelError("SomeKey", "Some error message");
 
             carServiceMock
-                .Setup(c => c.CategoryExists(carFormModel.CategoryId))
-                .Returns(true);
+                .Setup(c => c.CategoryExistsAsync(carFormModel.CategoryId))
+                .ReturnsAsync(true);
 
             dealerServiceMock
-                .Setup(c => c.IdByUser(It.IsAny<string>()))
-                .Returns(dealerId);
+                .Setup(c => c.IdByUserAsync(It.IsAny<string>()))
+                .ReturnsAsync(dealerId);
 
             var result = carsController.Edit(carId, carFormModel);
 
@@ -590,12 +590,12 @@
                 HttpContext = new DefaultHttpContext { User = claimsPrincipal }
             };
             carServiceMock
-                .Setup(c => c.CategoryExists(It.IsAny<int>()))
-                .Returns(true);
+                .Setup(c => c.CategoryExistsAsync(It.IsAny<int>()))
+                .ReturnsAsync(true);
 
             dealerServiceMock
-                .Setup(c => c.IdByUser(It.IsAny<string>()))
-                .Returns(dealerId);
+                .Setup(c => c.IdByUserAsync(It.IsAny<string>()))
+                .ReturnsAsync(dealerId);
 
             var carFormModel = new CarFormModel
             {
@@ -624,20 +624,20 @@
             var dealerId = 1;
 
             carServiceMock
-                .Setup(c => c.ExistsById(carId))
-                .Returns(true);
+                .Setup(c => c.ExistsByIdAsync(carId))
+                .ReturnsAsync(true);
             dealerServiceMock
-                .Setup(d => d.IsDealer(It.IsAny<string>()))
-                .Returns(true);
+                .Setup(d => d.IsDealerAsync(It.IsAny<string>()))
+                .ReturnsAsync(true);
             dealerServiceMock
-                .Setup(d => d.IdByUser(It.IsAny<string>()))
-                .Returns(dealerId);
+                .Setup(d => d.IdByUserAsync(It.IsAny<string>()))
+                .ReturnsAsync(dealerId);
             carServiceMock
-                .Setup(c => c.IsByDealer(carId, dealerId))
-                .Returns(true);
+                .Setup(c => c.IsByDealerAsync(carId, dealerId))
+                .ReturnsAsync(true);
             carServiceMock
-                .Setup(c => c.GetCarForDeleteById(carId))
-                .Returns(new CarDetailsServiceModel());
+                .Setup(c => c.GetCarForDeleteByIdAsync(carId))
+                .ReturnsAsync(new CarDetailsServiceModel());
 
             carsController.ControllerContext = new ControllerContext
             {
@@ -666,7 +666,7 @@
             var carsController = new CarsController(carServiceMock.Object, dealerServiceMock.Object, mapper);
             carsController.TempData = new TempDataDictionary(new DefaultHttpContext(), Mock.Of<ITempDataProvider>());
 
-            carServiceMock.Setup(c => c.ExistsById(It.IsAny<int>())).Returns(false);
+            carServiceMock.Setup(c => c.ExistsByIdAsync(It.IsAny<int>())).ReturnsAsync(false);
 
             var result = carsController.Delete(1);
 
@@ -687,8 +687,8 @@
             var carsController = new CarsController(carServiceMock.Object, dealerServiceMock.Object, mapper);
             carsController.TempData = new TempDataDictionary(new DefaultHttpContext(), Mock.Of<ITempDataProvider>());
 
-            carServiceMock.Setup(c => c.ExistsById(It.IsAny<int>())).Returns(true);
-            dealerServiceMock.Setup(d => d.IsDealer(It.IsAny<string>())).Returns(false);
+            carServiceMock.Setup(c => c.ExistsByIdAsync(It.IsAny<int>())).ReturnsAsync(true);
+            dealerServiceMock.Setup(d => d.IsDealerAsync(It.IsAny<string>())).ReturnsAsync(false);
 
             carsController.ControllerContext = new ControllerContext
             {
@@ -719,8 +719,8 @@
 
             var carsController = new CarsController(carServiceMock.Object, dealerServiceMock.Object, mapper);
             carsController.TempData = new TempDataDictionary(new DefaultHttpContext(), Mock.Of<ITempDataProvider>());
-            carServiceMock.Setup(c => c.ExistsById(It.IsAny<int>())).Returns(true);
-            carServiceMock.Setup(c => c.GetCarForDeleteById(It.IsAny<int>())).Returns(new CarDetailsServiceModel());
+            carServiceMock.Setup(c => c.ExistsByIdAsync(It.IsAny<int>())).ReturnsAsync(true);
+            carServiceMock.Setup(c => c.GetCarForDeleteByIdAsync(It.IsAny<int>())).ReturnsAsync(new CarDetailsServiceModel());
 
             carsController.ControllerContext = new ControllerContext
             {
@@ -750,16 +750,16 @@
             var carsController = new CarsController(carServiceMock.Object, dealerServiceMock.Object, mapper);
             carsController.TempData = new TempDataDictionary(new DefaultHttpContext(), Mock.Of<ITempDataProvider>());
             carServiceMock
-                .Setup(c => c.ExistsById(It.IsAny<int>()))
-                .Returns(true);
+                .Setup(c => c.ExistsByIdAsync(It.IsAny<int>()))
+                .ReturnsAsync(true);
             carServiceMock
-                .Setup(c => c.IsByDealer(It.IsAny<int>(), It.IsAny<int>()))
-                .Returns(true);
+                .Setup(c => c.IsByDealerAsync(It.IsAny<int>(), It.IsAny<int>()))
+                .ReturnsAsync(true);
             dealerServiceMock
-                .Setup(d => d.IsDealer(It.IsAny<string>()))
-                .Returns(true);
+                .Setup(d => d.IsDealerAsync(It.IsAny<string>()))
+                .ReturnsAsync(true);
             carServiceMock
-                .Setup(c => c.GetCarForDeleteById(It.IsAny<int>()))
+                .Setup(c => c.GetCarForDeleteByIdAsync(It.IsAny<int>()))
                 .Throws(new Exception("Test Exception"));
             carsController.ControllerContext = new ControllerContext
             {

@@ -36,7 +36,7 @@
 
         [Theory]
         [InlineData("Dealer", "+359888888888")]
-        public void PostBecomeShouldBeForAuthorizedUsersAndReturnRedirectWithValidModel(
+        public async void PostBecomeShouldBeForAuthorizedUsersAndReturnRedirectWithValidModel(
           string dealerName,
           string phoneNumber)
         {
@@ -67,7 +67,7 @@
                 d.PhoneNumber == phoneNumber &&
                 d.UserId == TestUser.Identifier));
             Assert.IsType<RedirectToActionResult>(result);
-            var redirectResult = (RedirectToActionResult)result;
+            var redirectResult = (RedirectToActionResult) await result;
             Assert.Equal("All", redirectResult.ActionName);
             Assert.Equal("Cars", redirectResult.ControllerName);
         }

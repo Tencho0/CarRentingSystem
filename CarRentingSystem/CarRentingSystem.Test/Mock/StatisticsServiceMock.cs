@@ -12,8 +12,8 @@
                 var statisticsServiceMock = new Mock<IStatisticsService>();
 
                 statisticsServiceMock
-                    .Setup(s => s.Total())
-                    .Returns(new StatisticsServiceModel
+                    .Setup(s => s.TotalAsync())
+                    .ReturnsAsync(new StatisticsServiceModel
                     {
                         TotalCars = 5,
                         TotalUsers = 10,

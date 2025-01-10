@@ -52,7 +52,7 @@ namespace CarRentingSystem.Test.Controllers
         }
 
         [Fact]
-        public void IndexReturnsViewWithLatestCarsFromCache()
+        public async void IndexReturnsViewWithLatestCarsFromCache()
         {
             var data = DatabaseMock.Instance;
             var mapper = MapperMock.Instance;
@@ -67,7 +67,7 @@ namespace CarRentingSystem.Test.Controllers
             var controller = new HomeController(carService, cache);
 
             // Act
-            var result = controller.Index() as ViewResult;
+            var result = await controller.Index() as ViewResult;
 
             // Assert
             Assert.NotNull(result);
