@@ -40,9 +40,7 @@
 
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
-                carsQuery = carsQuery.Where(c =>
-                    (c.Brand + " " + c.Model).ToLower().Contains(searchTerm.ToLower())
-                    || c.Description.ToLower().Contains(searchTerm.ToLower()));
+                carsQuery = carsQuery.Where(c =>($"{c.Brand} {c.Model} {c.Description}").ToLower().Contains(searchTerm.ToLower()));
             }
 
             carsQuery = sorting switch

@@ -14,11 +14,13 @@
         {
             var totalCars = await this.data.Cars.CountAsync(c => c.IsPublic);
             var totalUsers = await this.data.Users.CountAsync();
+            var totalRents = await this.data.Cars.CountAsync(c => c.IsPublic && c.Renter != null);
 
             return new StatisticsServiceModel
             {
                 TotalCars = totalCars,
-                TotalUsers = totalUsers
+                TotalUsers = totalUsers,
+                TotalRents = totalRents
             };
         }
     }
